@@ -4,6 +4,13 @@ import serial
 import time 
 import threading
 
+# Ideas :
+# Stream twitter feed / hashtag
+# Display train / subway next departures
+# Jenkins build status
+# Number of subscribers to a service
+# ...
+
 try:
     # in case of easy_installed PIL
     import Image, ImageDraw, ImageFont
