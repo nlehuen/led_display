@@ -15,6 +15,38 @@ from Queue import Queue
 font = ImageFont.truetype("Minecraftia.ttf", 8)
 # font = ImageFont.truetype("uni05_53.ttf", 8)
 
+def build_rainbow():
+    RAINBOW_COLORS = (
+        (255, 0, 0),
+        (255, 127, 0),
+        (255, 255, 0),
+        (0, 255, 0),
+        (0, 0, 255),
+        (111, 0, 255),
+        (143, 0, 255),
+        (255, 0, 0)
+    )
+
+    def rainbow_color(t, r):
+        "Returns a rainbow color, 0 <= t <= r"
+        if t == r:
+            return RAINBOW_COLORS[-1]
+        else:
+            idx = 1.0 * (len(RAINBOW_COLORS) - 1) * t / r
+            iidx = int(idx)
+            f = idx - iidx
+            i_f = 1.0 - f
+            c1 = RAINBOW_COLORS[iidx]
+            c2 = RAINBOW_COLORS[iidx + 1]
+            return "#%02x%02x%02x"%(
+                int(c1[0] * i_f + c2[0] * f),
+                int(c1[1] * i_f + c2[1] * f),
+                int(c1[2] * i_f + c2[2] * f)
+            )
+    return [rainbow_color(i,256) for i in range(256)]
+
+RAINBOW = build_rainbow() 
+
 def wave(t, mod):
     return abs(t%(mod*2-2)-mod+1)+1
 
@@ -76,13 +108,11 @@ class TweetAnimation(object):
         draw.rectangle([(0,0), img.size], fill="#000000")
 
         # Draw the author name
-        draw.text((-wave(t,self._author_size[0]-32), -3), self._author, font=font, fill="#660002")
+        color = RAINBOW[(t + 77) % len(RAINBOW)]
+        draw.text((-wave(t,self._author_size[0]-32), -3), self._author, font=font, fill=color)
 
-        # Variable color for the text
-        color_r = "%02x" % (100 + wave(t,155))
-        color_g = "%02x" % wave(t,50)
-        color_b = "%02x" % (wave(t,100) + wave(t-32,155))
-        color = "#%s%s%s"%(color_r, color_g, color_b)
+        # Draw the text
+        color = RAINBOW[t % len(RAINBOW)]
         draw.text((-wave(t,self._text_size[0]-32), 5), self._text, font=font, fill=color)
         
         return True
