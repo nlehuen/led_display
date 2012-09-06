@@ -221,7 +221,7 @@ if __name__ == '__main__':
     animator.queue(RainbowWoooowAnimation())
     animator.queue(TweetAnimation(dict(
         author='@nlehuen',
-        text="Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
+        text=u"Voix ambigÃ¼e d'un coeur qui au zÃ©phyr prÃ©fÃ¨re les jattes de kiwis. 1234567890"
     )))
 
     # For the moment, nothing more to do in the main thread
