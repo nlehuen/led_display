@@ -44,7 +44,8 @@ def build_rainbow():
                 int(c1[1] * i_f + c2[1] * f),
                 int(c1[2] * i_f + c2[2] * f)
             )
-    return [rainbow_color(i,256) for i in range(256)]
+
+    return [rainbow_color(i,512) for i in range(512)]
 
 RAINBOW = build_rainbow() 
 
@@ -59,7 +60,8 @@ class Display(object):
     def send_image(self, img):
         if img.size != (32, 16):
             img = img.crop((0, 0, 32, 16))
-        data = self._matrix_command + [(value==2 and chr(3) or chr(value)) for pixel in img.getdata() for value in pixel]
+        data = self._matrix_command
+        data = data + [(value==2 and chr(3) or chr(value)) for pixel in img.getdata() for value in pixel]
         data = "".join(data)
         self._serial.write(data)
 
@@ -78,7 +80,9 @@ class Animator(object):
         img = Image.new("RGB", (32, 16))
         draw = ImageDraw.Draw(img)
 
-        t = None
+        last_frame = time.time()
+        start_time = None
+        i = None
         while True:
             if self._current is None:
                 # Get next animation
@@ -86,13 +90,26 @@ class Animator(object):
 
                 # Start animation
                 self._current.start(self, img, draw)
-                t = 0
+                start_time = time.time()
+                i = 0
 
             # Draw next animation frame
-            if self._current.draw(self, img, draw, t):
+            if self._current.draw(self, img, draw, time.time() - start_time, i):
+                # Adjust wait time to maintain frame rate
+                # This assumes that sending the image to the display
+                # is done at a fixed rate
+                now = time.time()
+                wait = self._wait - (now - last_frame)
+                if wait > 0:
+                    time.sleep(wait)
+                    last_frame = time.time()
+                else:
+                    last_frame = now
+
                 # Display next animation frame
                 self._display.send_image(img)
-                t = t + 1
+                
+                i = i + 1
 
                 # Wait before next frame
                 time.sleep(self._wait)
@@ -102,7 +119,6 @@ class Animator(object):
                 # Ends animation
                 self._current.stop(self, img, draw)
                 self._current = None
-                t = None
 
 class TweetAnimation(object):
     def __init__(self, tweet):
@@ -118,17 +134,19 @@ class TweetAnimation(object):
     def stop(self, animator, img, draw):
         pass
 
-    def draw(self, animator, img, draw, t):
+    def draw(self, animator, img, draw, t, i):
         # Clear the screen
         draw.rectangle([(0,0), img.size], fill="#000000")
 
         # Draw the author name
-        color = RAINBOW[(t + 77) % len(RAINBOW)]
-        draw.text((-wave(t,self._author_size[0]-32), -3), self._author, font=font, fill=color)
+        color = RAINBOW[(i*3 + 77) % len(RAINBOW)]
+        pos = -wave(i, self._author_size[0] - 32)
+        draw.text((pos, -3), self._author, font=font, fill=color)
 
         # Draw the text
-        color = RAINBOW[t % len(RAINBOW)]
-        draw.text((-wave(t,self._text_size[0]-32), 5), self._text, font=font, fill=color)
+        color = RAINBOW[i % len(RAINBOW)]
+        pos = -wave(i, self._text_size[0] - 32)
+        draw.text((pos, 5), self._text, font=font, fill=color)
         
         return True
 
@@ -142,6 +160,9 @@ if __name__ == '__main__':
     animator = Animator(display, 25)
 
     # Start animation in another thread
-    threading.Thread(name = "Animator", target = animator.run).start()
+    animator_thread = threading.Thread(name = "Animator", target = animator.run)
+    animator_thread.start()
 
     animator.queue(TweetAnimation(tweet))
+
+
