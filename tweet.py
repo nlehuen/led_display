@@ -37,8 +37,17 @@ class TweetAnimation(object):
     def draw(self, t):
         img = Image.new("RGB", (32, 16))
         draw = ImageDraw.Draw(img)
-        draw.text((32-wave(t,self._author_size[0]),-2), self._author, font=font, fill="#ff0002")
-        draw.text((32-wave(t,self._text_size[0]),6), self._text, font=font, fill="#ffffff")
+
+        # Draw the author name
+        draw.text((-wave(t,self._author_size[0]-32), -3), self._author, font=font, fill="#660002")
+
+        # Variable color for the text
+        color_r = "%02x" % (100 + wave(t,155))
+        color_g = "%02x" % wave(t,50)
+        color_b = "%02x" % (wave(t,100) + wave(t-32,155))
+        color = "#%s%s%s"%(color_r, color_g, color_b)
+        draw.text((-wave(t,self._text_size[0]-32), 5), self._text, font=font, fill=color)
+        
         return img
 
 if __name__ == '__main__':
