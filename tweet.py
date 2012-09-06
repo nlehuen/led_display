@@ -10,6 +10,8 @@ except ImportError:
     # in case of distribution or windows PIL
     from PIL import Image, ImageDraw, ImageFont
 
+from Queue import Queue
+
 font = ImageFont.truetype("Minecraftia.ttf", 8)
 # font = ImageFont.truetype("uni05_53.ttf", 8)
 
@@ -26,6 +28,35 @@ class Display(object):
         data = "".join(data)
         self._serial.write(data)
 
+class Animator(object):
+    def __init__(self, display):
+        self._display = display
+        self._queue = Queue()
+        self._current = None
+
+    def queue(self, animation):
+        return self._queue.put(animation, True, None)
+
+    def run(self):
+        img = Image.new("RGB", (32, 16))
+        draw = ImageDraw.Draw(img)
+
+        t = None
+        while True:
+            if self._current is None:
+                self._current = self._queue.get(True, None)
+                self._current.start(self, img, draw)
+                t = 0
+
+            if self._current.draw(self, img, draw, t):
+                self._display.send_image(img)
+                t = t + 1
+                time.sleep(0.05)
+            else:
+                # Ends animation
+                self._current.stop(self, img, draw)
+                self._current = None
+
 class TweetAnimation(object):
     def __init__(self, tweet):
         self._tweet = tweet
@@ -34,9 +65,15 @@ class TweetAnimation(object):
         self._text = tweet['text']
         self._text_size = font.getsize(self._text)
 
-    def draw(self, t):
-        img = Image.new("RGB", (32, 16))
-        draw = ImageDraw.Draw(img)
+    def start(self, animator, img, draw):
+        pass
+
+    def stop(self, animator, img, draw):
+        pass
+
+    def draw(self, animator, img, draw, t):
+        # Clear the screen
+        draw.rectangle([(0,0), img.size], fill="#000000")
 
         # Draw the author name
         draw.text((-wave(t,self._author_size[0]-32), -3), self._author, font=font, fill="#660002")
@@ -48,7 +85,7 @@ class TweetAnimation(object):
         color = "#%s%s%s"%(color_r, color_g, color_b)
         draw.text((-wave(t,self._text_size[0]-32), 5), self._text, font=font, fill=color)
         
-        return img
+        return True
 
 if __name__ == '__main__':
     tweet = dict(
@@ -57,11 +94,8 @@ if __name__ == '__main__':
     )
 
     display = Display()
-    animation = TweetAnimation(tweet)
+    animator = Animator(display)
 
-    t = 0
-    while True:
-        t = t + 1
-        img = animation.draw(t)    
-        display.send_image(img)
-        time.sleep(0.05)
+    animator.queue(TweetAnimation(tweet))
+
+    animator.run()
