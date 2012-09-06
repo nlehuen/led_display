@@ -108,11 +108,9 @@ class Animator(object):
 
                 # Display next animation frame
                 self._display.send_image(img)
-                
-                i = i + 1
 
-                # Wait before next frame
-                time.sleep(self._wait)
+                # Next frame                
+                i = i + 1
             else:
                 # No more frame in the animation, time
                 # to move to the next one
