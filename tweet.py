@@ -19,10 +19,10 @@ def wave(t, mod):
 class Display(object):
     def __init__(self, port='COM6:', baudrate=2000000):
         self._serial = serial.Serial(port, baudrate, timeout=1)
+        self._matrix_command = [chr(2), chr(1)]
 
     def send_image(self, img):
-        data = [2, 1] + [(value==2 and 3 or value) for pixel in img.getdata() for value in pixel]
-        data = map(chr, data)
+        data = self._matrix_command + [(value==2 and chr(3) or chr(value)) for pixel in img.getdata() for value in pixel]
         data = "".join(data)
         self._serial.write(data)
 
