@@ -2,6 +2,7 @@
 
 import serial
 import time 
+import threading
 
 try:
     # in case of easy_installed PIL
@@ -56,15 +57,19 @@ class Display(object):
         self._matrix_command = [chr(2), chr(1)]
 
     def send_image(self, img):
+        if img.size != (32, 16):
+            img = img.crop((0, 0, 32, 16))
         data = self._matrix_command + [(value==2 and chr(3) or chr(value)) for pixel in img.getdata() for value in pixel]
         data = "".join(data)
         self._serial.write(data)
 
 class Animator(object):
-    def __init__(self, display):
+    def __init__(self, display, fps=20):
         self._display = display
         self._queue = Queue()
         self._current = None
+        self._fps = fps
+        self._wait = 1.0 / fps
 
     def queue(self, animation):
         return self._queue.put(animation, True, None)
@@ -76,18 +81,28 @@ class Animator(object):
         t = None
         while True:
             if self._current is None:
+                # Get next animation
                 self._current = self._queue.get(True, None)
+
+                # Start animation
                 self._current.start(self, img, draw)
                 t = 0
 
+            # Draw next animation frame
             if self._current.draw(self, img, draw, t):
+                # Display next animation frame
                 self._display.send_image(img)
                 t = t + 1
-                time.sleep(0.05)
+
+                # Wait before next frame
+                time.sleep(self._wait)
             else:
+                # No more frame in the animation, time
+                # to move to the next one
                 # Ends animation
                 self._current.stop(self, img, draw)
                 self._current = None
+                t = None
 
 class TweetAnimation(object):
     def __init__(self, tweet):
@@ -124,8 +139,9 @@ if __name__ == '__main__':
     )
 
     display = Display()
-    animator = Animator(display)
+    animator = Animator(display, 25)
+
+    # Start animation in another thread
+    threading.Thread(name = "Animator", target = animator.run).start()
 
     animator.queue(TweetAnimation(tweet))
-
-    animator.run()
