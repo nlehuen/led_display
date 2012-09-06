@@ -20,8 +20,8 @@ except ImportError:
 
 from Queue import Queue
 
-font = ImageFont.truetype("Minecraftia.ttf", 8)
-# font = ImageFont.truetype("uni05_53.ttf", 8)
+# font = ImageFont.truetype("Minecraftia.ttf", 8)
+font = ImageFont.truetype("Zepto 1.100.ttf", 8)
 
 def build_rainbow():
     RAINBOW_COLORS = (
@@ -146,12 +146,12 @@ class TweetAnimation(object):
         # Draw the author name
         color = RAINBOW[(i*3 + 77) % len(RAINBOW)]
         pos = -wave(i, self._author_size[0] - 32)
-        draw.text((pos, -3), self._author, font=font, fill=color)
+        draw.text((pos, -1), self._author, font=font, fill=color)
 
         # Draw the text
         color = RAINBOW[i % len(RAINBOW)]
         pos = -wave(i, self._text_size[0] - 32)
-        draw.text((pos, 5), self._text, font=font, fill=color)
+        draw.text((pos, 6), self._text, font=font, fill=color)
         
         return True
 
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     )
 
     display = Display()
-    animator = Animator(display, 25)
+    animator = Animator(display, 10)
 
     # Start animation in another thread
     animator_thread = threading.Thread(name = "Animator", target = animator.run)
