@@ -194,8 +194,19 @@ class TweetAnimation(object):
             print "KTHXBY", self._tweet['text']
             animator.queue(self)
 
-class TweetCollector(object):
-    pass
+class RainbowWoooowAnimation(object):
+    def animate(self, animator, img, draw):
+        size = img.size
+
+        try:
+            while True:
+                for x in range(size[0]):
+                    for y in range(size[1]):
+                        idx = int(x * y + animator.i * 7)
+                        draw.point((x, y), fill=RAINBOW[idx%len(RAINBOW)])
+                yield
+        finally:
+            animator.queue(self)
 
 if __name__ == '__main__':
     # Create display and animator
@@ -207,22 +218,10 @@ if __name__ == '__main__':
     animator_thread.daemon = True
     animator_thread.start()
 
-    # Enqueue first animation
+    animator.queue(RainbowWoooowAnimation())
     animator.queue(TweetAnimation(dict(
-        author = u'@nlehuen',
-        text = u"Voix ambigÃ¼e d'un coeur qui au zÃ©phyr prÃ©fÃ¨re les jattes de kiwis. 1234567890"
-    )))
-
-    # Enqueue next animation
-    animator.queue(TweetAnimation(dict(
-        author = u'@nlehuen',
-        text = u"This is another tweet"
-    )))
-
-    # Enqueue next animation
-    animator.queue(TweetAnimation(dict(
-        author = u'@nlehuen',
-        text = u"This is a last tweet"
+        author='@nlehuen',
+        text="Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
     )))
 
     # For the moment, nothing more to do in the main thread
