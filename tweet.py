@@ -20,8 +20,8 @@ except ImportError:
 
 from Queue import Queue
 
-# font = ImageFont.truetype("Minecraftia.ttf", 8)
-font = ImageFont.truetype("Zepto 1.100.ttf", 8)
+font = ImageFont.truetype("Minecraftia.ttf", 8)
+# font = ImageFont.truetype("Zepto 1.100.ttf", 8)
 
 def build_rainbow():
     RAINBOW_COLORS = (
@@ -61,7 +61,10 @@ def wave(t, mod):
 
 class Display(object):
     def __init__(self, port='COM6:', baudrate=2000000):
-        self._serial = serial.Serial(port, baudrate, timeout=1)
+        try:
+            self._serial = serial.Serial(port, baudrate, timeout=1)
+        except:
+            self._serial = None
         self._matrix_command = [chr(2), chr(1)]
 
     def send_image(self, img):
@@ -70,7 +73,8 @@ class Display(object):
         data = self._matrix_command
         data = data + [(value==2 and chr(3) or chr(value)) for pixel in img.getdata() for value in pixel]
         data = "".join(data)
-        self._serial.write(data)
+        if self._serial is not None:
+            self._serial.write(data)
 
 class Animator(object):
     def __init__(self, display, fps=20):
@@ -100,9 +104,15 @@ class Animator(object):
                 start_time = time.time()
                 i = 0
 
-            # Draw next animation frame
-            if self._current.draw(self, img, draw, time.time() - start_time, i):
-                # Adjust wait time to maintain frame rate
+            # Update the animation time
+            t = time.time() - start_time
+
+            # If there are other animations in the queue, kill this one once it
+            # has been displayed for 15 seconds ; otherwise the animation will keep running
+            # until it tells the Animator that it is over.
+            keep_going = self._queue.empty() or t<15.0
+            if keep_going and self._current.update(self, img, draw, t, i):
+                # Adjust wait time to maintain fixed frame rate
                 # This assumes that sending the image to the display
                 # is done at a fixed rate
                 now = time.time()
@@ -128,46 +138,58 @@ class Animator(object):
 class TweetAnimation(object):
     def __init__(self, tweet):
         self._tweet = tweet
-        self._author = tweet['author']
-        self._author_size = font.getsize(self._author)
-        self._text = tweet['text']
-        self._text_size = font.getsize(self._text)
+        self._author_size = font.getsize(self._tweet['author'])
+        self._text_size = font.getsize(self._tweet['text'])
 
     def start(self, animator, img, draw):
-        pass
+        print "Starting " + self._tweet['text']
 
     def stop(self, animator, img, draw):
         pass
 
-    def draw(self, animator, img, draw, t, i):
+    def update(self, animator, img, draw, t, i):
         # Clear the screen
         draw.rectangle([(0,0), img.size], fill="#000000")
 
         # Draw the author name
         color = RAINBOW[(i*3 + 77) % len(RAINBOW)]
         pos = -wave(i, self._author_size[0] - 32)
-        draw.text((pos, -1), self._author, font=font, fill=color)
+        draw.text((pos, -2), self._tweet['author'], font=font, fill=color)
 
         # Draw the text
         color = RAINBOW[i % len(RAINBOW)]
         pos = -wave(i, self._text_size[0] - 32)
-        draw.text((pos, 6), self._text, font=font, fill=color)
+        draw.text((pos, 5), self._tweet['text'], font=font, fill=color)
         
         return True
 
-if __name__ == '__main__':
-    tweet = dict(
-        author = u'@nlehuen',
-        text = u"Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
-    )
+class TweetCollector(object):
+    pass
 
+if __name__ == '__main__':
     display = Display()
     animator = Animator(display, 10)
 
     # Start animation in another thread
     animator_thread = threading.Thread(name = "Animator", target = animator.run)
+    animator_thread.daemon = True
     animator_thread.start()
 
-    animator.queue(TweetAnimation(tweet))
+    # Enqueue first animation
+    animator.queue(TweetAnimation(dict(
+        author = u'@nlehuen',
+        text = u"Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
+    )))
 
+    # Enqueue first animation
+    animator.queue(TweetAnimation(dict(
+        author = u'@nlehuen',
+        text = u"This is another tweet"
+    )))
 
+    # For the moment, nothing more to do in the main thread
+    t = 0
+    while True:
+        print t
+        t = t + 1
+        time.sleep(1)
