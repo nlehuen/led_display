@@ -48,7 +48,7 @@ def build_rainbow():
             i_f = 1.0 - f
             c1 = RAINBOW_COLORS[iidx]
             c2 = RAINBOW_COLORS[iidx + 1]
-            return "#%02x%02x%02x"%(
+            return (
                 int(c1[0] * i_f + c2[0] * f),
                 int(c1[1] * i_f + c2[1] * f),
                 int(c1[2] * i_f + c2[2] * f)
@@ -56,7 +56,8 @@ def build_rainbow():
 
     return [rainbow_color(i,512) for i in range(512)]
 
-RAINBOW = build_rainbow()
+RAINBOW_RGB = build_rainbow()
+RAINBOW = map(lambda c : "#%02x%02x%02x"%c, RAINBOW_RGB)
 
 def wave(t, mod):
     return abs(t%(mod*2-2)-mod+1)+1
@@ -126,7 +127,7 @@ class Animator(object):
             # If there are other animations in the queue, kill this one once it
             # has been displayed for 15 seconds ; otherwise the animation will keep running
             # until it tells the Animator that it is over.
-            keep_going = self._queue.empty() or t<=15.0
+            keep_going = self._queue.empty() or self.t<=15.0
 
             if keep_going:
                 try:
@@ -191,6 +192,7 @@ class TweetAnimation(object):
                 yield
         finally:
             print "KTHXBY", self._tweet['text']
+            animator.queue(self)
 
 class TweetCollector(object):
     pass
@@ -198,7 +200,7 @@ class TweetCollector(object):
 if __name__ == '__main__':
     # Create display and animator
     display = Display()
-    animator = Animator(display, 10)
+    animator = Animator(display, 30)
 
     # Start animation in another thread
     animator_thread = threading.Thread(name = "Animator", target = animator._run)
@@ -215,6 +217,12 @@ if __name__ == '__main__':
     animator.queue(TweetAnimation(dict(
         author = u'@nlehuen',
         text = u"This is another tweet"
+    )))
+
+    # Enqueue next animation
+    animator.queue(TweetAnimation(dict(
+        author = u'@nlehuen',
+        text = u"This is a last tweet"
     )))
 
     # For the moment, nothing more to do in the main thread
