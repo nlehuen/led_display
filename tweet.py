@@ -3,6 +3,7 @@
 import serial
 import time 
 import threading
+import traceback
 
 # Ideas :
 # Stream twitter feed / hashtag
@@ -64,6 +65,7 @@ class Display(object):
         try:
             self._serial = serial.Serial(port, baudrate, timeout=1)
         except:
+            traceback.print_exc()
             self._serial = None
         self._matrix_command = [chr(2), chr(1)]
 
@@ -99,8 +101,14 @@ class Animator(object):
                 # Get next animation
                 self._current = self._queue.get(True, None)
 
-                # Start animation
-                self._current.start(self, img, draw)
+                # Start animation, protecting the animator against exceptions
+                try:
+                    self._current.start(self, img, draw)
+                except:
+                    traceback.print_exc()
+                    self._current = None
+                    continue
+
                 start_time = time.time()
                 i = 0
 
@@ -111,7 +119,15 @@ class Animator(object):
             # has been displayed for 15 seconds ; otherwise the animation will keep running
             # until it tells the Animator that it is over.
             keep_going = self._queue.empty() or t<15.0
-            if keep_going and self._current.update(self, img, draw, t, i):
+
+            next_frame = False
+            if keep_going:
+                try:
+                    next_frame = self._current.update(self, img, draw, t, i)
+                except:
+                    traceback.print_exc()
+
+            if next_frame:
                 # Adjust wait time to maintain fixed frame rate
                 # This assumes that sending the image to the display
                 # is done at a fixed rate
@@ -132,7 +148,10 @@ class Animator(object):
                 # No more frame in the animation, time
                 # to move to the next one
                 # Ends animation
-                self._current.stop(self, img, draw)
+                try:
+                    self._current.stop(self, img, draw)
+                except:
+                    traceback.print_exc()
                 self._current = None
 
 class TweetAnimation(object):
@@ -190,6 +209,5 @@ if __name__ == '__main__':
     # For the moment, nothing more to do in the main thread
     t = 0
     while True:
-        print t
         t = t + 1
         time.sleep(1)
