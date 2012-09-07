@@ -2,7 +2,6 @@
 
 import time
 import threading
-import traceback
 
 # Ideas :
 # Stream twitter feed / hashtag
@@ -12,8 +11,10 @@ import traceback
 # A nice RAINBOW Gradient Wooooooow
 # ...
 
-from animator import font, wave, RAINBOW, RAINBOW_RGB, Animator
+from animator import ImageFont, wave, RAINBOW, RAINBOW_RGB, Animator
 import led
+
+font = ImageFont.truetype("Minecraftia.ttf", 8)
 
 class TweetAnimation(object):
     def __init__(self, tweet):

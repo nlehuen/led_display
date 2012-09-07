@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import traceback
 from Queue import Queue
 
 try:
@@ -44,9 +45,6 @@ def build_rainbow():
 
 RAINBOW_RGB = build_rainbow()
 RAINBOW = map(lambda c : "#%02x%02x%02x"%c, RAINBOW_RGB)
-
-font = ImageFont.truetype("Minecraftia.ttf", 8)
-# font = ImageFont.truetype("Zepto 1.100.ttf", 8)
 
 def wave(t, mod):
     return abs(t%(mod*2-2)-mod+1)+1
