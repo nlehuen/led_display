@@ -81,13 +81,14 @@ class Display(object):
             self._serial.write(data)
 
 class Animator(object):
-    def __init__(self, display, fps=20):
+    def __init__(self, display, fps=20, animation_timeout=15.0):
         self._display = display
         self._queue = Queue()
         self._animation = None
         self._animation_generator = None
         self._fps = fps
         self._wait = 1.0 / fps
+        self._animation_timeout = animation_timeout
 
     def queue(self, animation):
         return self._queue.put(animation, True, None)
@@ -127,7 +128,7 @@ class Animator(object):
             # If there are other animations in the queue, kill this one once it
             # has been displayed for 15 seconds ; otherwise the animation will keep running
             # until it tells the Animator that it is over.
-            keep_going = self._queue.empty() or self.t<=15.0
+            keep_going = self._queue.empty() or self.t <= self._animation_timeout
 
             if keep_going:
                 try:
@@ -151,9 +152,12 @@ class Animator(object):
                     # Increment frame count
                     self.i = self.i + 1
                 except StopIteration:
-                    pass
+                    self._animation = None
+                    self._animation_generator = None
                 except:
                     traceback.print_exc()
+                    self._animation = None
+                    self._animation_generator = None
             else:
                 try:
                     # Close the generator, this sends a GeneratorExit
@@ -192,6 +196,8 @@ class TweetAnimation(object):
                 yield
         finally:
             print "KTHXBY", self._tweet['text']
+
+            # Put this animation back into the queue
             animator.queue(self)
 
 class RainbowWoooowAnimation(object):
@@ -200,18 +206,23 @@ class RainbowWoooowAnimation(object):
 
         try:
             while True:
-                for x in range(size[0]):
-                    for y in range(size[1]):
-                        idx = int(x * y + animator.i * 7)
-                        draw.point((x, y), fill=RAINBOW[idx%len(RAINBOW)])
+                # Example using Image.putdata instead of multiple
+                # Image.putpixel or ImageDraw.point calls
+                rainbow = [
+                    RAINBOW_RGB[int(x * y + animator.i * 7)%len(RAINBOW)]
+                    for y in range(size[1])
+                    for x in range(size[0])
+                ]
+                img.putdata(rainbow)
                 yield
         finally:
+            # Put this animation back into the queue
             animator.queue(self)
 
 if __name__ == '__main__':
     # Create display and animator
     display = Display()
-    animator = Animator(display, 30)
+    animator = Animator(display, fps=30, animation_timeout=30)
 
     # Start animation in another thread
     animator_thread = threading.Thread(name = "Animator", target = animator._run)
