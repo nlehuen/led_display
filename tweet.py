@@ -5,7 +5,6 @@
 # Display train / subway next departures
 # Jenkins build status
 # Number of subscribers to a service
-# A nice RAINBOW Gradient Wooooooow
 # ...
 
 from animator import RAINBOW, RAINBOW_RGB, ImageFont
@@ -44,21 +43,3 @@ class TweetAnimation(object):
             # Put this animation back into the queue
             animator.queue(self)
 
-class RainbowWoooowAnimation(object):
-    def animate(self, animator, img, draw):
-        size = img.size
-
-        try:
-            while True:
-                # Example using Image.putdata instead of multiple
-                # Image.putpixel or ImageDraw.point calls
-                rainbow = [
-                    RAINBOW_RGB[int(x * y + animator.i * 7)%len(RAINBOW)]
-                    for y in range(size[1])
-                    for x in range(size[0])
-                ]
-                img.putdata(rainbow)
-                yield
-        finally:
-            # Put this animation back into the queue
-            animator.queue(self)

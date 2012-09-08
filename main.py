@@ -6,6 +6,7 @@ import traceback
 import leddisplay
 import animator
 import tweet
+import rainbow
 
 if __name__ == '__main__':
     # Create display and animator
@@ -22,11 +23,11 @@ if __name__ == '__main__':
 
     animator = animator.Animator(display, fps=30, animation_timeout=30)
 
+    animator.queue(rainbow.RainbowWoooowAnimation())
     animator.queue(tweet.TweetAnimation(dict(
         author='@nlehuen',
         text=u"Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
     )))
-    animator.queue(tweet.RainbowWoooowAnimation())
 
     # For the moment, nothing more to do in the main thread
     animator.join()
