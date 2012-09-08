@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import threading
 import time
 import traceback
 from Queue import Queue
@@ -46,9 +47,6 @@ def build_rainbow():
 RAINBOW_RGB = build_rainbow()
 RAINBOW = map(lambda c : "#%02x%02x%02x"%c, RAINBOW_RGB)
 
-def wave(t, mod):
-    return abs(t%(mod*2-2)-mod+1)+1
-
 class Animator(object):
     def __init__(self, display, fps=20, animation_timeout=15.0):
         self._display = display
@@ -59,8 +57,19 @@ class Animator(object):
         self._wait = 1.0 / fps
         self._animation_timeout = animation_timeout
 
+        # Start animation in another thread
+        self._thread = threading.Thread(name = "Animator", target = self._run)
+        self._thread.daemon = True
+        self._thread.start()
+
+    def join(self):
+        self._thread.join()
+
     def queue(self, animation):
         return self._queue.put(animation, True, None)
+
+    def wave(self, period):
+        return abs(self.i%(period*2-2)-period+1)+1
 
     def _run(self):
         img = Image.new("RGB", (32, 16))
@@ -116,7 +125,13 @@ class Animator(object):
                         last_frame = now
 
                     # Display next animation frame
-                    self._display.send_image(img)
+                    try:
+                        self._display.send_image(img)
+                    except:
+                        # If the display is broken, stop
+                        # the animator
+                        traceback.print_exc()
+                        return
 
                     # Increment frame count
                     self.i = self.i + 1

@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import serial
+import traceback
 
 class Display(object):
     def __init__(self, port='COM6:', baudrate=2000000):
-        try:
-            self._serial = serial.Serial(port, baudrate, timeout=1)
-        except:
-            traceback.print_exc()
-            self._serial = None
+        self._serial = serial.Serial(port, baudrate, timeout=1)
         self._matrix_command = [chr(2), chr(1)]
 
     def send_image(self, img):
