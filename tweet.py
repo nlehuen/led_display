@@ -18,7 +18,7 @@ class TweetAnimation(object):
         self._text_size = font.getsize(self._tweet['text'])
 
     def animate(self, animator, img, draw):
-        print "Starting", self._tweet['text']
+        # print "Starting", self._tweet['text']
 
         try:
             while True:
@@ -38,7 +38,7 @@ class TweetAnimation(object):
                 # Send frame
                 yield
         finally:
-            print "KTHXBY", self._tweet['text']
+            # print "KTHXBY", self._tweet['text']
 
             # Put this animation back into the queue
             animator.queue(self)
