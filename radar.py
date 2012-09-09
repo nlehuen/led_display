@@ -42,19 +42,12 @@ class Bot(object):
     def pos(self, t):
         while True:
             x = self.x + self.v[0] * (t - self.t0)
-
-            if x < 0 or x > self._size[0]:
-                self.reset(t)
-                continue
-
             y = self.y + self.v[1] * (t - self.t0)
 
-            if y < 0 or y > self._size[1]:
+            if x < 0 or x > self._size[0] or y < 0 or y > self._size[1]:
                 self.reset(t)
-                continue
-
-            return (x, y)
-
+            else:
+                return (x, y)
 
 class RadarAnimation(object):
     def __init__(self, rps = 3.0):

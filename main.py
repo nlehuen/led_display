@@ -10,6 +10,7 @@ import animator
 import tweet
 import rainbow
 import radar
+import fadetoblack
 
 if __name__ == '__main__':
     # Create display and animator
@@ -24,16 +25,20 @@ if __name__ == '__main__':
         import tkdisplay
         display = tkdisplay.Display()
 
-    animator = animator.Animator(display, fps=25, animation_timeout=30)
+    animator = animator.Animator(display, fps=25, animation_timeout=5)
 
     # Animation queue
 
     animator.queue(radar.RadarAnimation())
 
+    animator.queue(fadetoblack.FadeToBlackAnimation(2))
+
     animator.queue(tweet.TweetAnimation(dict(
         author='@nlehuen',
         text=u"Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
     )))
+
+    animator.queue(fadetoblack.FadeToBlackAnimation(2))
 
     animator.queue(rainbow.RainbowWoooowAnimation())
 
