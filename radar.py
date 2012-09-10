@@ -11,7 +11,7 @@ class Bot(object):
         self.reset(t0)
 
     def reset(self, t0):
-        self.t0 = t0
+        self.t0 = t0 + random.uniform(0,5)
         self.direction = random.uniform(0, math.pi / 2.0)
         self.velocity = random.uniform(0.5, 5)
         self.v = [
@@ -44,7 +44,7 @@ class Bot(object):
             x = self.x + self.v[0] * (t - self.t0)
             y = self.y + self.v[1] * (t - self.t0)
 
-            if x < 0 or x > self._size[0] or y < 0 or y > self._size[1]:
+            if t > self.t0 and (x < 0 or x > self._size[0] or y < 0 or y > self._size[1]):
                 self.reset(t)
             else:
                 return (x, y)
@@ -95,7 +95,7 @@ class RadarAnimation(object):
 
                 # Draw the bots
                 pos = [bot.pos(animator.t) for bot in bots]
-                pos = [bot for bot in pos if visible(bot, to, 25)]
+                # pos = [bot for bot in pos if visible(bot, to, 25)]
                 draw.point(pos, fill="#ffffff")
 
                 yield
