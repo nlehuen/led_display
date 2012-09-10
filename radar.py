@@ -95,7 +95,7 @@ class RadarAnimation(object):
 
                 # Draw the bots
                 pos = [bot.pos(animator.t) for bot in bots]
-                # pos = [bot for bot in pos if visible(bot, to, 25)]
+                pos = [bot for bot in pos if visible(bot, to, 25)]
                 draw.point(pos, fill="#ffffff")
 
                 yield
