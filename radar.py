@@ -50,7 +50,8 @@ class Bot(object):
                 return (x, y)
 
 class RadarAnimation(object):
-    def __init__(self, rps = 3.0):
+    def __init__(self, bots=2, rps = 3.0):
+        self._bots = bots
         self._rps = rps
 
     def animate(self, animator, img, draw):
@@ -60,7 +61,7 @@ class RadarAnimation(object):
 
         bots = [
             Bot(size, animator.t)
-            for b in range(4)
+            for b in range(self._bots)
         ]
 
         try:
@@ -76,11 +77,20 @@ class RadarAnimation(object):
                     center[0] + radius * math.cos(angle),
                     center[1] + radius * math.sin(angle)
                 )
-                draw.line((center, to), fill=RAINBOW[animator.i % len(RAINBOW)])
+                draw.line((center, to), fill="#009900")
+
+                def visible(a, b, limit):
+                    u1 = a[0] - center[0]
+                    u2 = b[0] - center[0]
+                    v1 = a[1] - center[1]
+                    v2 = b[1] - center[1]
+                    mul = u1 * v2 - u2 * v1
+                    return 0 <= u1*u2 and 0 <= v1*v2 and 0 <= mul and mul <= limit
 
                 # Draw the bots
-                # TODO : only draw dots lying on the radar line
-                draw.point([bot.pos(animator.t) for bot in bots], fill="#ffffff")
+                pos = [bot.pos(animator.t) for bot in bots]
+                pos = [bot for bot in pos if visible(bot, to, 25)]
+                draw.point(pos, fill="#ffffff")
 
                 yield
         finally:
