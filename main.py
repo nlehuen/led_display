@@ -25,11 +25,11 @@ if __name__ == '__main__':
         import tkdisplay
         display = tkdisplay.Display()
 
-    animator = animator.Animator(display, fps=25, animation_timeout=20)
+    animator = animator.Animator(display, fps=25, animation_timeout=30)
 
     # Animation queue
 
-    animator.queue(radar.RadarAnimation(bots=2, rps = 5))
+    animator.queue(radar.RadarAnimation(bots=3, rps = 5))
 
     animator.queue(fadetoblack.FadeToBlackAnimation(2))
 

@@ -80,11 +80,17 @@ class RadarAnimation(object):
                 draw.line((center, to), fill="#009900")
 
                 def visible(a, b, limit):
+                    # Custom made visibility algo :
+                    # Vector coordinates have the same sign
+                    # and norm of vectorial product is less than a limit
+                    # (which means both vectors are nearly colinear)
+                    # Normally |u x v| = |u| . |v| . sin(angle(u, v))
+                    # Therefore if the angle is small enough, |u x v| is small
                     u1 = a[0] - center[0]
                     u2 = b[0] - center[0]
                     v1 = a[1] - center[1]
                     v2 = b[1] - center[1]
-                    mul = u1 * v2 - u2 * v1
+                    mul = abs(u1 * v2 - u2 * v1) # |u x v| if u and v are on the same (X,Y) plane
                     return 0 <= u1*u2 and 0 <= v1*v2 and 0 <= mul and mul <= limit
 
                 # Draw the bots
