@@ -11,6 +11,7 @@ import tweet
 import rainbow
 import radar
 import fadetoblack
+import bouncer
 
 if __name__ == '__main__':
     # Create display and animator
@@ -28,6 +29,7 @@ if __name__ == '__main__':
     animator = animator.Animator(display, fps=25, animation_timeout=30)
 
     # Animation queue
+    animator.queue(bouncer.BouncerAnimation())
 
     animator.queue(radar.RadarAnimation(bots=3, rps = 5))
 
