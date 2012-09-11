@@ -77,7 +77,7 @@ class RadarAnimation(object):
                     center[0] + radius * math.cos(angle),
                     center[1] + radius * math.sin(angle)
                 )
-                draw.line((center, to), fill="#009900")
+                draw.line((center, to), fill="#007700")
 
                 def visible(a, b, limit):
                     # Custom made visibility algo :
