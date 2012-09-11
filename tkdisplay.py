@@ -3,10 +3,10 @@ import threading
 
 try:
     # in case of easy_installed PIL
-    import Image, ImageDraw, ImageFont, ImageTk
+    import ImageTk
 except ImportError:
     # in case of distribution or windows PIL
-    from PIL import Image, ImageDraw, ImageFont, ImageTk
+    from PIL import ImageTk
 
 from Tkinter import *
 
