@@ -65,7 +65,7 @@ class Animator(object):
     def join(self):
         self._thread.join()
 
-    def queue(self, animation, block=True, timeout=-1):
+    def queue(self, animation, block=True, timeout=0):
         return self._queue.put(animation, block, timeout)
 
     def wave(self, period):

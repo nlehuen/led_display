@@ -32,24 +32,19 @@ if __name__ == '__main__':
     animator = animator.Animator(display, queue=256, fps=25, animation_timeout=30)
 
     # Animation queue
-    #animator.queue(animations.heartbeat.HeartBeatAnimation())
+    animator.queue(animations.heartbeat.HeartBeatAnimation())
 
-    #animator.queue(animations.tweet.TweetAnimation(dict(
-    #    author='@nlehuen',
-    #    text=u"Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
-    #)))
+    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
-    #animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
+    animator.queue(animations.bouncer.BouncerAnimation())
 
-    #animator.queue(animations.bouncer.BouncerAnimation())
+    animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
 
-    #animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
+    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
-    #animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
+    animator.queue(animations.rainbow.RainbowWoooowAnimation())
 
-    #animator.queue(animations.rainbow.RainbowWoooowAnimation())
-
-    #animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
+    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
     # Launch tweet fetcher
     tweet_fetcher = animations.tweet.TweetFetcher(
