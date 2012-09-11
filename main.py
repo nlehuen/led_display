@@ -7,11 +7,13 @@ import leddisplay
 import animator
 
 # Animations
-import tweet
-import rainbow
-import radar
-import fadetoblack
-import bouncer
+import animations.tweet
+import animations.rainbow
+import animations.radar
+import animations.fadetoblack
+import animations.bouncer
+
+import animations
 
 if __name__ == '__main__':
     # Create display and animator
@@ -29,20 +31,22 @@ if __name__ == '__main__':
     animator = animator.Animator(display, fps=25, animation_timeout=30)
 
     # Animation queue
-    animator.queue(bouncer.BouncerAnimation())
-
-    animator.queue(radar.RadarAnimation(bots=3, rps = 5))
-
-    animator.queue(fadetoblack.FadeToBlackAnimation(2))
-
-    animator.queue(tweet.TweetAnimation(dict(
+    animator.queue(animations.tweet.TweetAnimation(dict(
         author='@nlehuen',
         text=u"Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
     )))
 
-    animator.queue(fadetoblack.FadeToBlackAnimation(2))
+    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
-    animator.queue(rainbow.RainbowWoooowAnimation())
+    animator.queue(animations.bouncer.BouncerAnimation())
+
+    animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
+
+    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
+
+    animator.queue(animations.rainbow.RainbowWoooowAnimation())
+
+    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
     # For the moment, nothing more to do in the main thread
     animator.join()
