@@ -19,6 +19,7 @@ class TweetAnimation(object):
 
     def animate(self, animator, img, draw):
         # print "Starting", self._tweet['text']
+        size = img.size
 
         try:
             while True:
@@ -27,12 +28,12 @@ class TweetAnimation(object):
 
                 # Draw the author name
                 color = RAINBOW[(animator.i*3 + 77) % len(RAINBOW)]
-                pos = -animator.wave(self._author_size[0] - 32)
+                pos = -animator.wave(self._author_size[0] - size[0])
                 draw.text((pos, -3), self._tweet['author'], font=font, fill=color)
 
                 # Draw the text
                 color = RAINBOW[animator.i % len(RAINBOW)]
-                pos = -animator.wave(self._text_size[0] - 32)
+                pos = -animator.wave(self._text_size[0] - size[0])
                 draw.text((pos, 5), self._tweet['text'], font=font, fill=color)
 
                 # Send frame

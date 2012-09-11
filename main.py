@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     if display is None:
         import tkdisplay
-        display = tkdisplay.Display()
+        display = tkdisplay.Display((32, 16))
 
     animator = animator.Animator(display, fps=25, animation_timeout=30)
 

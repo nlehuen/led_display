@@ -13,6 +13,7 @@ from Tkinter import *
 class Display(object):
     def __init__(self, size=(32,16)):
         self._size = size
+        self._resize = (size[0] * 8, size[1] * 8)
 
         self._root = Tk()
         self._label = Label(self._root, text = "Hello, world !")
@@ -27,6 +28,6 @@ class Display(object):
         return self._size
 
     def send_image(self, img):
-        img = img.resize((320, 160))
+        img = img.resize(self._resize)
         self._img = ImageTk.PhotoImage(img)
         self._label.config(image = self._img)
