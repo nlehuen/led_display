@@ -12,6 +12,7 @@ import animations.rainbow
 import animations.radar
 import animations.fadetoblack
 import animations.bouncer
+import animations.heartbeat
 
 import animations
 
@@ -31,6 +32,8 @@ if __name__ == '__main__':
     animator = animator.Animator(display, fps=25, animation_timeout=30)
 
     # Animation queue
+    animator.queue(animations.heartbeat.HeartBeatAnimation())
+
     animator.queue(animations.tweet.TweetAnimation(dict(
         author='@nlehuen',
         text=u"Voix ambigüe d'un coeur qui au zéphyr préfère les jattes de kiwis. 1234567890"
