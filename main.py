@@ -2,8 +2,8 @@
 
 import time
 import traceback
+import json
 
-import leddisplay
 import animator
 
 # Animations
@@ -17,10 +17,15 @@ import animations.heartbeat
 import animations
 
 if __name__ == '__main__':
+    # Configuration file
+    with open('configuration.json') as configuration_file:
+        configuration = json.load(configuration_file)
+
     # Create display and animator
 
     display = None
     try:
+        import leddisplay
         display = leddisplay.Display()
     except:
         traceback.print_exc()
@@ -49,7 +54,8 @@ if __name__ == '__main__':
     # Launch tweet fetcher
     tweet_fetcher = animations.tweet.TweetFetcher(
         animator,
-        animations.tweet.UserPassAuth('XXXXXX', 'XXXXXX')
+        animations.tweet.UserPassAuth(configuration['twitter']['login'], configuration['twitter']['password']),
+        "#LED"
     )
 
     # For the moment, nothing more to do in the main thread
