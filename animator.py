@@ -48,9 +48,9 @@ RAINBOW_RGB = build_rainbow()
 RAINBOW = map(lambda c : "#%02x%02x%02x"%c, RAINBOW_RGB)
 
 class Animator(object):
-    def __init__(self, display, fps=20, animation_timeout=15.0):
+    def __init__(self, display, queue=0, fps=20, animation_timeout=15.0):
         self._display = display
-        self._queue = Queue()
+        self._queue = Queue(queue)
         self._animation = None
         self._animation_generator = None
         self._fps = fps

@@ -27,12 +27,13 @@ class TweetAnimation(object):
         self._repeat = repeat
         self._t0 = time.time()
 
+        self._author = '@' + self._tweet[u'user'][u'screen_name']
+        self._text = self._tweet[u'text']
+
     def animate(self, animator, img, draw):
         size = img.size
-        author = '@' + self._tweet[u'user'][u'screen_name']
-        author_size = font.getsize(author)
-        text = self._tweet[u'text']
-        text_size = font.getsize(text)
+        author_size = font.getsize(self._author)
+        text_size = font.getsize(self._text)
 
         try:
             while self._duration==0 or animator.t < self._duration:
@@ -42,12 +43,12 @@ class TweetAnimation(object):
                 # Draw the author name
                 color = RAINBOW[(animator.i*3 + 77) % len(RAINBOW)]
                 pos = -animator.wave(author_size[0] - size[0] - 3)
-                draw.text((pos, -3), author, font=font, fill=color)
+                draw.text((pos, -3), self._author, font=font, fill=color)
 
                 # Draw the text
                 color = RAINBOW[animator.i % len(RAINBOW)]
                 pos = -animator.wave(text_size[0] + size[0])
-                draw.text((pos, 5), text, font=font, fill=color)
+                draw.text((pos, 5), self._text, font=font, fill=color)
 
                 # Send frame
                 yield
@@ -70,10 +71,10 @@ class TweetFetcher(object):
     def _run(self):
         twitter_stream = TwitterStream(auth = self._twitter_auth)
 
-        last_t = time.time() - 10
         for tweet in twitter_stream.statuses.sample():
-            now = time.time()
-            if (now - last_t) >= self._duration:
-                tweet_animation = TweetAnimation(tweet, self._duration, False)
-                self._animator.queue(tweet_animation, False)
-                last_t = now
+            try:
+                tweet_animation = TweetAnimation(tweet, duration=self._duration, repeat=False)
+                self._animator.queue(tweet_animation, block=False)
+            except:
+                pass
+

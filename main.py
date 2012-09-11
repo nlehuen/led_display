@@ -29,7 +29,7 @@ if __name__ == '__main__':
         import tkdisplay
         display = tkdisplay.Display((32, 16))
 
-    animator = animator.Animator(display, fps=25, animation_timeout=30)
+    animator = animator.Animator(display, queue=256, fps=25, animation_timeout=30)
 
     # Animation queue
     #animator.queue(animations.heartbeat.HeartBeatAnimation())
