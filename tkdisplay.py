@@ -11,17 +11,22 @@ except ImportError:
 from Tkinter import *
 
 class Display(object):
-    def __init__(self):
-        self.root = Tk()
-        self.label = Label(self.root, text = "Hello, world !")
-        self.label.pack()
-        self.img = None
+    def __init__(self, size=(32,16)):
+        self._size = size
+
+        self._root = Tk()
+        self._label = Label(self._root, text = "Hello, world !")
+        self._label.pack()
+        self._img = None
 
         # Launch main loop
-        self.mainLoop = threading.Thread(name="TkLoop", target=self.root.mainloop)
-        self.mainLoop.start()
+        self._mainLoop = threading.Thread(name="TkLoop", target=self._root.mainloop)
+        self._mainLoop.start()
+
+    def size(self):
+        return self._size
 
     def send_image(self, img):
         img = img.resize((320, 160))
-        self.img = ImageTk.PhotoImage(img)
-        self.label.config(image = self.img)
+        self._img = ImageTk.PhotoImage(img)
+        self._label.config(image = self._img)

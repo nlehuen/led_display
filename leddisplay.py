@@ -8,6 +8,9 @@ class Display(object):
         self._serial = serial.Serial(port, baudrate, timeout=1)
         self._matrix_command = [chr(2), chr(1)]
 
+    def size(self):
+        return (32, 16)
+
     def send_image(self, img):
         if img.size != (32, 16):
             img = img.crop((0, 0, 32, 16))

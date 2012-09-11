@@ -72,7 +72,7 @@ class Animator(object):
         return abs(self.i%(period*2-2)-period+1)+1
 
     def _run(self):
-        img = Image.new("RGB", (32, 16))
+        img = Image.new("RGB", self._display.size())
         draw = ImageDraw.Draw(img)
 
         # Timestamp of the last frame sent to the display
