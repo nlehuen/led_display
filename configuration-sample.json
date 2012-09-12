@@ -1,4 +1,8 @@
 {
+    "leddisplay":{
+        "port":"/dev/ttyUSB0",
+        "speed":2000000
+    },
     "twitter":{
         "login":"XXXXXX",
         "password":"YYYYYY"

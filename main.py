@@ -26,7 +26,10 @@ if __name__ == '__main__':
     display = None
     try:
         import leddisplay
-        display = leddisplay.Display()
+        display = leddisplay.Display(
+            port = configuration[u'leddisplay'][u'port'].encode(),
+            speed = configuration[u'leddisplay'][u'speed']
+        )
     except:
         traceback.print_exc()
 

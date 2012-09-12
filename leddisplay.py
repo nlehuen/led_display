@@ -4,8 +4,8 @@ import serial
 import traceback
 
 class Display(object):
-    def __init__(self, port='COM6:', baudrate=2000000):
-        self._serial = serial.Serial(port, baudrate, timeout=1)
+    def __init__(self, port, speed):
+        self._serial = serial.Serial(port, speed, timeout=1)
         self._matrix_command = [chr(2), chr(1)]
 
     def size(self):
