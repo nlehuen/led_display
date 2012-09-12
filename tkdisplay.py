@@ -13,7 +13,10 @@ from Tkinter import *
 class Display(object):
     def __init__(self, size, scale):
         self._size = size
-        self._resize = (size[0] * scale, size[1] * scale)
+        if scale != 1:
+            self._resize = (size[0] * scale, size[1] * scale)
+        else:
+            self._resize = None
 
         self._root = Tk()
         self._root.title("Emulator")
@@ -29,6 +32,7 @@ class Display(object):
         return self._size
 
     def send_image(self, img):
-        img = img.resize(self._resize)
+        if self._resize is not None:
+            img = img.resize(self._resize)
         self._img = ImageTk.PhotoImage(img)
         self._label.config(image = self._img)
