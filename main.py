@@ -7,14 +7,18 @@ import json
 import animator
 
 # Animations
-import animations.tweet
 import animations.rainbow
 import animations.radar
 import animations.fadetoblack
 import animations.bouncer
 import animations.heartbeat
 
-import animations
+# Try to load Twitter animations
+try:
+    import animations.tweet
+except ImportError:
+    print "Please install twitter module from http://pypi.python.org/pypi/twitter/"
+    animations.tweet = None
 
 if __name__ == '__main__':
     # Configuration file
@@ -60,14 +64,16 @@ if __name__ == '__main__':
     animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
     # Launch tweet fetcher
-    tweet_fetcher = animations.tweet.TweetFetcher(
-        animator,
-        animations.tweet.UserPassAuth(
-            configuration['twitter']['login'],
-            configuration['twitter']['password']
-        ),
-        configuration['twitter']['track']
-    )
+    if animations.tweet is not None:
+        tweet_fetcher = animations.tweet.TweetFetcher(
+            animator,
+            animations.tweet.UserPassAuth(
+                configuration['twitter']['login'],
+                configuration['twitter']['password']
+            ),
+            configuration['twitter']['track']
+        )
+        tweet_fetcher.start()
 
     # For the moment, nothing more to do in the main thread
     animator.join()

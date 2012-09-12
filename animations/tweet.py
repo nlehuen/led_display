@@ -10,11 +10,7 @@
 import threading
 import time
 
-try:
-    from twitter import Twitter, TwitterStream, OAuth, UserPassAuth
-except:
-    print "Please install twitter module from http://pypi.python.org/pypi/twitter/"
-
+from twitter import Twitter, TwitterStream, OAuth, UserPassAuth
 
 from animator import RAINBOW, RAINBOW_RGB, ImageFont
 
@@ -64,6 +60,7 @@ class TweetFetcher(object):
         self._twitter_auth = twitter_auth
         self._track = track
 
+    def start(self):
         # Launch Twitter stream fetcher
         self._thread = threading.Thread(name = "Twitter", target = self._run)
         self._thread.daemon = True
