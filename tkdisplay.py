@@ -16,6 +16,7 @@ class Display(object):
         self._resize = (size[0] * scale, size[1] * scale)
 
         self._root = Tk()
+        self._root.title("Emulator")
         self._label = Label(self._root, text = "Hello, world !")
         self._label.pack()
         self._img = None

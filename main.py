@@ -49,17 +49,13 @@ if __name__ == '__main__':
     )
 
     # Animation queue
-    animator.queue(animations.heartbeat.HeartBeatAnimation())
+    animator.queue(animations.rainbow.RainbowWoooowAnimation())
 
-    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
+    animator.queue(animations.heartbeat.HeartBeatAnimation())
 
     animator.queue(animations.bouncer.BouncerAnimation())
 
     animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
-
-    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
-
-    animator.queue(animations.rainbow.RainbowWoooowAnimation())
 
     animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
