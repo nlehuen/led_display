@@ -27,8 +27,8 @@ if __name__ == '__main__':
     try:
         import leddisplay
         display = leddisplay.Display(
-            port = configuration[u'leddisplay'][u'port'].encode(),
-            speed = configuration[u'leddisplay'][u'speed']
+            port = configuration['leddisplay']['port'].encode(),
+            speed = configuration['leddisplay']['speed']
         )
     except:
         traceback.print_exc()
@@ -39,9 +39,9 @@ if __name__ == '__main__':
 
     animator = animator.Animator(
         display,
-        queue=configuration[u'animator'][u'queue'],
-        fps=configuration[u'animator'][u'fps'],
-        animation_timeout=configuration[u'animator'][u'timeout']
+        queue=configuration['animator']['queue'],
+        fps=configuration['animator']['fps'],
+        animation_timeout=configuration['animator']['timeout']
     )
 
     # Animation queue
@@ -62,8 +62,11 @@ if __name__ == '__main__':
     # Launch tweet fetcher
     tweet_fetcher = animations.tweet.TweetFetcher(
         animator,
-        animations.tweet.UserPassAuth(configuration['twitter']['login'], configuration['twitter']['password']),
-        "#LED"
+        animations.tweet.UserPassAuth(
+            configuration['twitter']['login'],
+            configuration['twitter']['password']
+        ),
+        configuration['twitter']['track']
     )
 
     # For the moment, nothing more to do in the main thread
