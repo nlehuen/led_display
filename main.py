@@ -35,9 +35,14 @@ if __name__ == '__main__':
 
     if display is None:
         import tkdisplay
-        display = tkdisplay.Display((32, 16))
+        display = tkdisplay.Display((32, 16), 8)
 
-    animator = animator.Animator(display, queue=256, fps=25, animation_timeout=30)
+    animator = animator.Animator(
+        display,
+        queue=configuration[u'animator'][u'queue'],
+        fps=configuration[u'animator'][u'fps'],
+        animation_timeout=configuration[u'animator'][u'timeout']
+    )
 
     # Animation queue
     animator.queue(animations.heartbeat.HeartBeatAnimation())

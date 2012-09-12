@@ -6,5 +6,10 @@
     "twitter":{
         "login":"XXXXXX",
         "password":"YYYYYY"
+    },
+    "animator":{
+        "queue":256,
+        "fps":25,
+        "timeout":30
     }
 }

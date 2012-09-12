@@ -11,9 +11,9 @@ except ImportError:
 from Tkinter import *
 
 class Display(object):
-    def __init__(self, size=(32,16)):
+    def __init__(self, size, scale):
         self._size = size
-        self._resize = (size[0] * 8, size[1] * 8)
+        self._resize = (size[0] * scale, size[1] * scale)
 
         self._root = Tk()
         self._label = Label(self._root, text = "Hello, world !")
