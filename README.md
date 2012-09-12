@@ -72,6 +72,8 @@ Development and debugging
 
 If the serial port or display cannot be found, the `main.py` script emulates a display with a GUI window (using `Tkinter`). This means that you should be able to write and run animations without a LED display. It's less fun but it is much more practical when writing code on the go.
 
+![Emulator screenshot](https://bitbucket.org/nlehuen/led_display/raw/488c7223873d/emulator-screenshot.png)
+
 Changing animations
 -------------------
 
