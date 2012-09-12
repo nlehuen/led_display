@@ -32,7 +32,8 @@ if __name__ == '__main__':
         import leddisplay
         display = leddisplay.Display(
             port = configuration['leddisplay']['port'].encode(),
-            speed = configuration['leddisplay']['speed']
+            speed = configuration['leddisplay']['speed'],
+            threaded = True
         )
     except:
         traceback.print_exc()
