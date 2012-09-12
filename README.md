@@ -53,6 +53,7 @@ Once the driver is installed, when you plug the screen into a USB port you shoul
         "timeout":30
     }
 }
+```
 
 Running the application
 -----------------------
