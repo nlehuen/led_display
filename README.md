@@ -3,6 +3,11 @@ led_display
 
 This project runs a set of animations on a LED display like [the one produced by hackspark.fr](http://hackspark.fr/fr/afficheur-a-led-rvb-controle-en-usb-de-32cm-x-16cm.html).
 
+Hat tip
+-------
+
+Thanks to @jon1012 from Hackspark, first for their great display, then for the [HackSpark.LedDisplay](https://bitbucket.org/jon1012/hackspark.leddisplay) project that gave me lots of insights on how to program it.
+
 Configuring the application
 ---------------------------
 
