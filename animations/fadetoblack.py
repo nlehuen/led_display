@@ -3,8 +3,6 @@
 import math
 import random
 
-from animator import Image
-
 class FadeToBlackAnimation(object):
     def __init__(self, duration = 3.0):
         self._duration = duration
@@ -13,8 +11,7 @@ class FadeToBlackAnimation(object):
         try:
             while animator.t < self._duration:
                 # Fade screen
-                faded = Image.eval(img, lambda x : x * 0.9)
-                img.paste(faded)
+                animator.fade(0.9)
 
                 yield
         finally:

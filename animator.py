@@ -22,6 +22,10 @@ class Animator(object):
         self._wait = 1.0 / fps
         self._animation_timeout = animation_timeout
 
+        # Prepare image and draw surface
+        self._img = Image.new("RGB", self._display.size())
+        self._draw = ImageDraw.Draw(self._img)
+
         # Start animation in another thread
         self._thread = threading.Thread(name = "Animator", target = self._run)
         self._thread.daemon = True
@@ -36,10 +40,11 @@ class Animator(object):
     def wave(self, period):
         return abs(self.i%(period*2-2)-period+1)+1
 
-    def _run(self):
-        img = Image.new("RGB", self._display.size())
-        draw = ImageDraw.Draw(img)
+    def fade(self, factor = 0.9):
+        faded = Image.eval(self._img, lambda x : x * factor)
+        self._img.paste(faded)
 
+    def _run(self):
         # Timestamp of the last frame sent to the display
         # Initially it means nothing
         last_frame = time.time()
@@ -53,7 +58,7 @@ class Animator(object):
 
                 # Start frame generator, protecting the animator against exceptions
                 try:
-                    self._animation_generator = self._animation.animate(self, img, draw)
+                    self._animation_generator = self._animation.animate(self, self._img, self._draw)
                 except:
                     traceback.print_exc()
                     self._animation = None
@@ -92,7 +97,7 @@ class Animator(object):
                     # Display next animation frame
                     try:
                         if paint is None or paint is True:
-                            self._display.send_image(img)
+                            self._display.send_image(self._img)
                     except:
                         # If the display is broken, stop
                         # the animator

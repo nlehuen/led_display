@@ -3,8 +3,6 @@
 import math
 import random
 
-from animator import Image
-
 class Bot(object):
     def __init__(self, size, t0):
         self._size = size
@@ -73,8 +71,7 @@ class BouncerAnimation(object):
         try:
             while True:
                 # Fade screen
-                faded = Image.eval(img, lambda x : x * 0.7)
-                img.paste(faded)
+                animator.fade(0.7)
 
                 # Draw the bots
                 pos = [bot.pos(animator.t) for bot in bots]

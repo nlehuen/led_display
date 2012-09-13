@@ -3,8 +3,6 @@
 import math
 import random
 
-from animator import Image
-
 class Bot(object):
     def __init__(self, size, t0):
         self._size = size
@@ -67,8 +65,7 @@ class RadarAnimation(object):
         try:
             while True:
                 # Fade screen
-                faded = Image.eval(img, lambda x : x * 0.9)
-                img.paste(faded)
+                animator.fade(0.9)
 
                 # Draw the radar line
                 # One full rotation in self._rps seconds

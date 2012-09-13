@@ -3,7 +3,6 @@
 import math
 import random
 
-from animator import Image
 from colors import RAINBOW
 
 class HeartBeatAnimation(object):
@@ -26,8 +25,7 @@ class HeartBeatAnimation(object):
                 # Draw heartbeat
                 for i, hb in enumerate(heartbeat):
                     # Fade screen
-                    faded = Image.eval(img, lambda x : x * 0.95)
-                    img.paste(faded)
+                    animator.fade(0.95)
 
                     # Draw the point
                     draw.point((i, hb), fill=RAINBOW[int(hb * len(RAINBOW) / size[1])])
