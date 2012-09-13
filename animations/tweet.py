@@ -18,9 +18,9 @@ from animator import Image, ImageDraw, ImageFont
 from colors import RAINBOW, RAINBOW_RGB
 
 class TweetAnimation(object):
-    def __init__(self, twitter_auth, track, speed, wait, font, size, baseline):
+    def __init__(self, twitter_auth, track, fps, wait, font, size, baseline):
         self._fetcher = TweetFetcher(self, twitter_auth, track)
-        self._speed = speed
+        self._fps = fps
         self._wait = wait
         self._font = ImageFont.truetype(font, size)
         self._baseline = baseline
@@ -109,11 +109,6 @@ class TweetAnimation(object):
         y = 0
 
         while True:
-            # We only paint the screen every self._speed frame
-            if animator.i % self._speed != 0:
-                yield False
-                continue
-
             # Only scroll the screen when more tweets
             # have to be displayed.
             # TODO : also scroll the screen when a tweet
@@ -135,6 +130,8 @@ class TweetAnimation(object):
             pop = 0
 
             try:
+                start = time.time()
+
                 # Get first image
                 timg = image_iterator.next()
 
@@ -177,6 +174,14 @@ class TweetAnimation(object):
             except StopIteration:
                 pass
 
+            # Sleep a bit
+            # Note that if this FPS setting is bigger than for the animator,
+            # the animator will win.
+            if self._fps > 0:
+                wait = (1.0 / self._fps) - (time.time() - start)
+                if wait > 0:
+                    time.sleep(wait)
+
             # Send image
             yield True
 
@@ -186,9 +191,8 @@ class TweetAnimation(object):
                     self._image_queue.popleft()
 
                 # Wait for 2 seconds once at least an image has been popped
-                start = animator.t
-                while animator.t - start < self._wait:
-                    yield False
+                for tick in animator.pause(self._wait):
+                    yield tick
 
 class TweetFetcher(object):
     def __init__(self, animation, twitter_auth, track):

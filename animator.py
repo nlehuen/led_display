@@ -49,6 +49,11 @@ class Animator(object):
         faded = Image.eval(self._img, lambda x : x * factor)
         self._img.paste(faded)
 
+    def pause(self, t):
+        start = self.t
+        while self.t - start < t:
+            yield False
+
     def mainloop(self):
         "Main loop"
 

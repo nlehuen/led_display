@@ -50,6 +50,20 @@ if __name__ == '__main__':
     )
 
     # Animation queue
+    if animations.tweet is not None:
+        animator.queue(animations.tweet.TweetAnimation(
+            twitter_auth = animations.tweet.UserPassAuth(
+                configuration['twitter']['login'],
+                configuration['twitter']['password']
+            ),
+            track = configuration['twitter']['track'],
+            fps = configuration['twitter'].get('fps', 0),
+            wait = configuration['twitter'].get('wait', 1),
+            font = configuration['twitter'].get('font', 'alterebro-pixel-font.ttf'),
+            size = configuration['twitter'].get('size', 16),
+            baseline = configuration['twitter'].get('baseline', 4)
+        ))
+
     animator.queue(animations.rainbow.RainbowWoooowAnimation())
 
     animator.queue(animations.heartbeat.HeartBeatAnimation())
@@ -59,20 +73,6 @@ if __name__ == '__main__':
     animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
 
     animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
-
-    if animations.tweet is not None:
-        animator.queue(animations.tweet.TweetAnimation(
-            twitter_auth = animations.tweet.UserPassAuth(
-                configuration['twitter']['login'],
-                configuration['twitter']['password']
-            ),
-            track = configuration['twitter']['track'],
-            speed = configuration['twitter'].get('speed', 1),
-            wait = configuration['twitter'].get('wait', 1),
-            font = configuration['twitter'].get('font', 'alterebro-pixel-font.ttf'),
-            size = configuration['twitter'].get('size', 16),
-            baseline = configuration['twitter'].get('baseline', 4)
-        ))
 
     # For the moment, run the animator in the main thread
     animator.mainloop()
