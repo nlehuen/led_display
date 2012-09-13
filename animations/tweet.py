@@ -191,8 +191,7 @@ class TweetAnimation(object):
                     self._image_queue.popleft()
 
                 # Wait for 2 seconds once at least an image has been popped
-                for tick in animator.pause(self._wait):
-                    yield tick
+                yield self._wait
 
 class TweetFetcher(object):
     def __init__(self, animation, twitter_auth, track):

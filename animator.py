@@ -49,11 +49,6 @@ class Animator(object):
         faded = Image.eval(self._img, lambda x : x * factor)
         self._img.paste(faded)
 
-    def pause(self, t):
-        start = self.t
-        while self.t - start < t:
-            yield False
-
     def mainloop(self):
         "Main loop"
 
@@ -93,13 +88,23 @@ class Animator(object):
             if keep_going:
                 try:
                     # Have the animation generate the next frame
-                    paint = self._animation_generator.next()
+                    yielded = self._animation_generator.next()
 
                     # Adjust wait time to maintain fixed frame rate
                     # This assumes that sending the image to the display
                     # is done at a fixed rate
                     now = time.time()
                     wait = self._wait - (now - last_frame)
+
+                    # If the animation yielded a number,
+                    # it's a number of seconds to wait on this frame.
+                    # Here we use a trick in order to skip using isinstance(send, numbers.Number)
+                    if yielded is not True:
+                        # max(None, x) == x
+                        # max(False, x) == x if x != 0
+                        # max(True, x) == True
+                        wait = max(yielded, wait)
+
                     if wait > 0:
                         time.sleep(wait)
                         last_frame = time.time()
@@ -108,7 +113,7 @@ class Animator(object):
 
                     # Display next animation frame
                     try:
-                        if paint is None or paint is True:
+                        if yielded is None or yielded is True:
                             self._display.send_image(self._img)
                     except:
                         # If the display is broken, stop

@@ -116,3 +116,5 @@ class DoNothingAnimation(object):
 ```
 
 Yielding `False` allows the animator to skip sending the frame to the display, hence saving bandwidth etc. Of course you can also yield `True`, which is the same as yielding nothing.
+
+The animation can also pause the animator by yielding the number of seconds (float) of the pause. See for example the `animations.tweet` module.
