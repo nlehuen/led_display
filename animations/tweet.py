@@ -36,9 +36,13 @@ class TweetAnimation(object):
         self._tweet_queue.append(tweet)
 
     def _generate_tweet_image(self, tweet):
-        # Get strings from tweet
-        author = '@' + tweet['user']['screen_name']
-        text = tweet['text']
+        try:
+            # Get strings from tweet
+            author = '@' + tweet['user']['screen_name']
+            text = tweet['text']
+        except KeyError:
+            # Malformed tweet (e.g. tweet deletion)
+            return None
 
         # Compute text metrics
         author_size = font.getsize(author)
@@ -79,11 +83,18 @@ class TweetAnimation(object):
             try:
                 # get a tweet from the tweet queue
                 tweet = self._tweet_queue.popleft()
-                # builds the tweet image and enqueue it
+
+                # builds the tweet image
                 img = self._generate_tweet_image(tweet)
-                self._image_queue.append(img)
-                # return the tweet image in the iterator
-                yield img
+
+                # img can be None if there are problem
+                # drawing it
+                if img is not None:
+                    # Enqueue
+                    self._image_queue.append(img)
+
+                    # return the tweet image in the iterator
+                    yield img
             except IndexError:
                 break
 
@@ -100,7 +111,7 @@ class TweetAnimation(object):
         while True:
             # We only paint the screen every self._speed frame
             if animator.i % self._speed != 0:
-                yield
+                yield False
                 continue
 
             # Only scroll the screen when more tweets
@@ -167,7 +178,7 @@ class TweetAnimation(object):
                 pass
 
             # Send image
-            yield
+            yield True
 
             # Pop tweets that are no longer needed
             if pop > 0:
@@ -177,7 +188,7 @@ class TweetAnimation(object):
                 # Wait for 2 seconds once at least an image has been popped
                 start = animator.t
                 while animator.t - start < self._wait:
-                    yield
+                    yield False
 
 class TweetFetcher(object):
     def __init__(self, animation, twitter_auth, track):
