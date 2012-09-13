@@ -6,7 +6,8 @@
     "twitter":{
         "login":"XXXXXX",
         "password":"YYYYYY",
-        "track":"whatever"
+        "track":"whatever",
+        "speed":1
     },
     "animator":{
         "queue":256,

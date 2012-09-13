@@ -50,27 +50,26 @@ if __name__ == '__main__':
     )
 
     # Animation queue
-    animator.queue(animations.rainbow.RainbowWoooowAnimation())
+    # animator.queue(animations.rainbow.RainbowWoooowAnimation())
 
-    animator.queue(animations.heartbeat.HeartBeatAnimation())
+    # animator.queue(animations.heartbeat.HeartBeatAnimation())
 
-    animator.queue(animations.bouncer.BouncerAnimation())
+    # animator.queue(animations.bouncer.BouncerAnimation())
 
-    animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
+    # animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
 
-    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
+    # animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
     # Launch tweet fetcher
     if animations.tweet is not None:
-        tweet_fetcher = animations.tweet.TweetFetcher(
-            animator,
-            animations.tweet.UserPassAuth(
+        animator.queue(animations.tweet.TweetAnimation(
+            twitter_auth = animations.tweet.UserPassAuth(
                 configuration['twitter']['login'],
                 configuration['twitter']['password']
             ),
-            configuration['twitter']['track']
-        )
-        tweet_fetcher.start()
+            track = configuration['twitter']['track'],
+            speed = configuration['twitter']['speed']
+        ))
 
     # For the moment, nothing more to do in the main thread
     animator.join()
