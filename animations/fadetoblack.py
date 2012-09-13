@@ -3,7 +3,7 @@
 import math
 import random
 
-from animator import Image, RAINBOW
+from animator import Image
 
 class FadeToBlackAnimation(object):
     def __init__(self, duration = 3.0):

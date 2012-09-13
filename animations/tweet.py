@@ -14,7 +14,8 @@ from collections import deque
 
 from twitter import Twitter, TwitterStream, OAuth, UserPassAuth
 
-from animator import RAINBOW, RAINBOW_RGB, Image, ImageDraw, ImageFont
+from animator import Image, ImageDraw, ImageFont
+from colors import RAINBOW, RAINBOW_RGB
 
 font = ImageFont.truetype("alterebro-pixel-font.ttf", 16)
 

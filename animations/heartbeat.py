@@ -3,7 +3,8 @@
 import math
 import random
 
-from animator import Image, RAINBOW
+from animator import Image
+from colors import RAINBOW
 
 class HeartBeatAnimation(object):
     def animate(self, animator, img, draw):

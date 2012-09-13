@@ -3,7 +3,7 @@
 import math
 import random
 
-from animator import Image, RAINBOW
+from animator import Image
 
 class Bot(object):
     def __init__(self, size, t0):

@@ -4,7 +4,8 @@
 
 import math
 import random
-from animator import RAINBOW, RAINBOW_RGB, ImageFont
+
+from colors import RAINBOW, RAINBOW_RGB
 
 def rainbow1(animator, x, y):
     return RAINBOW_RGB[int(
