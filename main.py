@@ -68,7 +68,9 @@ if __name__ == '__main__':
                 configuration['twitter']['password']
             ),
             track = configuration['twitter']['track'],
-            speed = configuration['twitter']['speed']
+            speed = configuration['twitter'].get('speed',1),
+            baseline = configuration['twitter'].get('baseline',4),
+            wait = configuration['twitter'].get('wait',1)
         ))
 
     # For the moment, nothing more to do in the main thread
