@@ -73,5 +73,5 @@ if __name__ == '__main__':
             wait = configuration['twitter'].get('wait',1)
         ))
 
-    # For the moment, nothing more to do in the main thread
-    animator.join()
+    # For the moment, run the animator in the main thread
+    animator.mainloop()

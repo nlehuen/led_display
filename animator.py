@@ -26,25 +26,32 @@ class Animator(object):
         self._img = Image.new("RGB", self._display.size())
         self._draw = ImageDraw.Draw(self._img)
 
+    def start(self):
         # Start animation in another thread
-        self._thread = threading.Thread(name = "Animator", target = self._run)
+        self._thread = threading.Thread(name = "Animator", target = self.mainloop)
         self._thread.daemon = True
         self._thread.start()
 
     def join(self):
+        "Wait for the animator to end."
         self._thread.join()
 
     def queue(self, animation, block=True, timeout=0):
+        "Enqueue an animation. block and timeout have the same meaning as in the Queue.Queue.put method."
         return self._queue.put(animation, block, timeout)
 
     def wave(self, period):
-        return abs(self.i%(period*2-2)-period+1)+1
+        "Return a triangular wave signal from 0 to period-1"
+        return abs(self.i%(period*2-2)-period+1)
 
     def fade(self, factor = 0.9):
+        "Fade the display to black by the given factor"
         faded = Image.eval(self._img, lambda x : x * factor)
         self._img.paste(faded)
 
-    def _run(self):
+    def mainloop(self):
+        "Main loop"
+
         # Timestamp of the last frame sent to the display
         # Initially it means nothing
         last_frame = time.time()
