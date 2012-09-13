@@ -111,7 +111,7 @@ class Animator(object):
             if keep_going:
                 try:
                     # Have the animation generate the next frame
-                    self._animation_generator.next()
+                    paint = self._animation_generator.next()
 
                     # Adjust wait time to maintain fixed frame rate
                     # This assumes that sending the image to the display
@@ -126,7 +126,8 @@ class Animator(object):
 
                     # Display next animation frame
                     try:
-                        self._display.send_image(img)
+                        if paint is None or paint is True:
+                            self._display.send_image(img)
                     except:
                         # If the display is broken, stop
                         # the animator
