@@ -8,8 +8,10 @@
         "password":"YYYYYY",
         "track":"whatever",
         "speed":1,
-        "baseline":4,
-        "wait":1
+        "wait":1,
+        "font":"alterebro-pixel-font.ttf",
+        "size":16,
+        "baseline":4
     },
     "animator":{
         "queue":256,

@@ -17,14 +17,13 @@ from twitter import Twitter, TwitterStream, OAuth, UserPassAuth
 from animator import Image, ImageDraw, ImageFont
 from colors import RAINBOW, RAINBOW_RGB
 
-font = ImageFont.truetype("alterebro-pixel-font.ttf", 16)
-
 class TweetAnimation(object):
-    def __init__(self, twitter_auth, track, speed=1, baseline=4, wait=1):
+    def __init__(self, twitter_auth, track, speed, wait, font, size, baseline):
         self._fetcher = TweetFetcher(self, twitter_auth, track)
         self._speed = speed
-        self._baseline = baseline
         self._wait = wait
+        self._font = ImageFont.truetype(font, size)
+        self._baseline = baseline
 
         self._tweet_queue = deque(maxlen=128)
         self._image_queue = deque(maxlen=128)
@@ -46,8 +45,8 @@ class TweetAnimation(object):
             return None
 
         # Compute text metrics
-        author_size = font.getsize(author)
-        text_size = font.getsize(text)
+        author_size = self._font.getsize(author)
+        text_size = self._font.getsize(text)
 
         # Compute image metrics
         img_size = (
@@ -62,8 +61,8 @@ class TweetAnimation(object):
         # Draw tweet in image
         author_color = RAINBOW[random.randint(0,len(RAINBOW)-1)]
         text_color = RAINBOW[random.randint(0,len(RAINBOW)-1)]
-        draw.text((0, -self._baseline), author, font=font, fill=author_color)
-        draw.text((author_size[0] + 4, -self._baseline), text, font=font, fill=text_color)
+        draw.text((0, -self._baseline), author, font=self._font, fill=author_color)
+        draw.text((author_size[0] + 4, -self._baseline), text, font=self._font, fill=text_color)
         draw.line(((img_size[0]-3,0),(img_size[0]-3,img_size[1]-1)), fill="#ffffff")
 
         # Keep the text as an attribute to the image
@@ -199,7 +198,7 @@ class TweetFetcher(object):
 
     def start(self):
         # Launch Twitter stream fetcher
-        self._thread = threading.Thread(name = "Twitter", target = self._run)
+        self._thread = threading.Thread(name = "TweetFetcher", target = self._run)
         self._thread.daemon = True
         self._thread.start()
 
