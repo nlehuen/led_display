@@ -106,3 +106,13 @@ class StroboscopeAnimation(object):
             # Signal the animator that the frame has been drawn
             yield
 ```
+
+When the animation yields, it tells the animator that it is done drawing, and that the frame can be sent to the display. If for any reason you want to skip a frame, you can do so by yielding `False` :
+
+```python
+class DoNothingAnimation(object):
+    def animate(self, animator, img, draw):
+        yield False
+```
+
+Yielding `False` allows the animator to skip sending the frame to the display, hence saving bandwidth etc. Of course you can also yield `True`, which is the same as yielding nothing.
