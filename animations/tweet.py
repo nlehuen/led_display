@@ -34,7 +34,7 @@ class TweetAnimation(object):
     def _generate_tweet_image(self, tweet):
         # Get strings from tweet
         author = '@' + tweet['user']['screen_name']
-        text = tweet['text'][:16]
+        text = tweet['text']
 
         # Compute text metrics
         author_size = font.getsize(author)
@@ -54,7 +54,7 @@ class TweetAnimation(object):
         author_color = RAINBOW[random.randint(0,len(RAINBOW)-1)]
         text_color = RAINBOW[random.randint(0,len(RAINBOW)-1)]
         draw.text((0, 0), author, font=font, fill=author_color)
-        draw.text((author_size[0] + 4, 0), text, font=font, fill=author_color)
+        draw.text((author_size[0] + 4, 0), text, font=font, fill=text_color)
         draw.line(((img_size[0]-3,0),(img_size[0]-3,img_size[1]-1)), fill="#ffffff")
 
         return img
@@ -88,18 +88,27 @@ class TweetAnimation(object):
                 # We skip painting the screen
                 yield
 
-            ox = ox - 1
+            if len(self._tweet_queue) > 0:
+                # Only scroll the screen when more tweets
+                # have to be displayed
+                ox = ox - 1
+
             x = ox
             y = 0
 
             # Iterate on all images. The iterator built
             # by self._images() takes care of the image queue,
             # generating new images as needed.
-            pop = 0
             image_iterator = self._images()
 
+            # pop will tell us how many image we must remove
+            # from left
+            pop = 0
+
             try:
+                # Get first image
                 timg = image_iterator.next()
+
                 while True:
                     # We drop images that are off the first line entirely
                     if x + timg.size[0] <= 0 and y == 0:
