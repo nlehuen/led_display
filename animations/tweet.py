@@ -10,6 +10,7 @@
 import threading
 import time
 import random
+import traceback
 from collections import deque
 
 from twitter import Twitter, TwitterStream, OAuth, UserPassAuth
@@ -108,13 +109,15 @@ class TweetAnimation(object):
         x = ox
         y = 0
 
+        # No need to scroll at first
+        scroll = False
+
         while True:
-            # Only scroll the screen when more tweets
-            # have to be displayed.
-            # TODO : also scroll the screen when a tweet
-            # was not fully drawn on screen.
-            if len(self._tweet_queue) > 0:
+            # Scroll the screen when the
+            # last tweet ended up off screen.
+            if scroll:
                 ox = ox - 1
+                scroll = False
 
             # Begin drawing at origin on first line
             x = ox
@@ -151,7 +154,7 @@ class TweetAnimation(object):
                         continue
 
                     # Paste the current image
-                    img.paste(timg, (x,y))
+                    img.paste(timg, (x, y))
 
                     # Move the cursor
                     x = x + timg.size[0]
@@ -169,6 +172,7 @@ class TweetAnimation(object):
                         # End drawing if all vertical spaced
                         # is used
                         if y > img.size[1]:
+                            scroll = True
                             break
 
             except StopIteration:
@@ -206,7 +210,35 @@ class TweetFetcher(object):
         self._thread.start()
 
     def _run(self):
-        twitter_stream = TwitterStream(auth = self._twitter_auth)
+        try:
+            twitter_stream = TwitterStream(auth = self._twitter_auth)
 
-        for tweet in twitter_stream.statuses.filter(track = self._track):
-            self._animation.queue_tweet(tweet)
+            for tweet in twitter_stream.statuses.filter(track = self._track):
+                self._animation.queue_tweet(tweet)
+        except:
+            print "Could not connect to Twitter, generating random tweets"
+
+            for tweet in self._random():
+                self._animation.queue_tweet(tweet)
+
+    def _random(self):
+        id_chars = u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        text_chars = id_chars + u"àéèïîôöùüç€$£              "
+
+        def random_string(source, max_length):
+            length = random.randint(1, max_length)
+            result = []
+            for i in range(length):
+                result.append(random.choice(source))
+            return "".join(result)
+
+        while True:
+            tweet = dict(
+                user = dict(
+                    screen_name = random_string(id_chars, 12)
+                ),
+                text = random_string(text_chars, 160)
+            )
+            yield tweet
+            time.sleep(random.uniform(0,1))
+
