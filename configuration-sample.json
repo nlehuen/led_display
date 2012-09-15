@@ -9,8 +9,18 @@
         "speed":2000000
     },
     "twitter":{
-        "login":"XXXXXX",
-        "password":"YYYYYY",
+        "auth":{
+            "basic":{
+                "login":"XXXXXX",
+                "password":"YYYYYY",
+            },
+            "oauth":{
+                "consumer_key":"",
+                "consumer_secret":"",
+                "oauth_token":"",
+                "oauth_secret":"",
+            }
+        },
         "track":"whatever",
         "fps":0,
         "wait":2.5,
