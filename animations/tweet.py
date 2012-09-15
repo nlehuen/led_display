@@ -214,6 +214,14 @@ class TweetFetcher(object):
         try:
             twitter_stream = TwitterStream(auth = self._twitter_auth)
 
+            # Display what is going to be tracked
+            self._animation.queue_tweet(dict(
+                user = dict(
+                    screen_name = 'this_display'
+                ),
+                text = "tracking \"%s\""%self._track
+            ))
+
             for tweet in twitter_stream.statuses.filter(track = self._track):
                 self._animation.queue_tweet(tweet)
         except:
