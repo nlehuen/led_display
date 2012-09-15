@@ -72,14 +72,14 @@ Display emulator
 
 If the serial port or display cannot be found, the `main.py` script emulates a display with a GUI window (using `Tkinter`). This means that you should be able to write and run animations without a LED display. It's less fun but it is much more practical when writing code on the go.
 
-![Emulator screenshot](https://bitbucket.org/nlehuen/led_display/raw/488c7223873d/emulator-screenshot.png)
+![Emulator screenshot](https://raw.github.com/nlehuen/led_display/master/screenshots/emulator.png)
 
 Tracking Twitter
 ----------------
 
 The code comes with a Twitter ticker animation. It uses the [Twitter streaming API](https://dev.twitter.com/docs/api/1.1/post/statuses/filter) to track tweets with a given set of keywords.
 
-![Twitter ticker screenshot](https://bitbucket.org/nlehuen/led_display/raw/b47ffffe02b8/twitter-screenshot.png)
+![Twitter ticker screenshot](https://raw.github.com/nlehuen/led_display/master/screenshots/twitter.png)
 
 Have a look at the `twitter` section in `configuration-sample.json` for a sample configuration. The syntax for the `twitter.track` parameter in explained in the [Twitter API documentation](https://dev.twitter.com/docs/streaming-apis/parameters#track).
 
