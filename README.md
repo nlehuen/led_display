@@ -67,6 +67,19 @@ Running the application
 python main.py
 ```
 
+Tracking Twitter
+----------------
+
+The code comes with a Twitter ticker animation. It uses the [Twitter streaming API](https://dev.twitter.com/docs/api/1.1/post/statuses/filter) to track tweets with a given set of keywords.
+
+Have a look at the `twitter` section in `configuration-sample.json` for a sample configuration. The syntax for the `twitter.track` parameter in explained in the [Twitter API documentation](https://dev.twitter.com/docs/streaming-apis/parameters#track).
+
+The Twitter ticker animation requires a TrueType font to render text. "Pixel" fonts are of course recommended. Three small freeware fonts downloaded from [dafont.com](http://www.dafont.com/bitmap.php) are provided. Unfortunately they are more suited to Western language tweets, and you often get cyrillic, arabic or asian tweets when tracking popular keywords. Unicode fonts solve this problem, you can read about them in the [Unicode Font Guide For Free/Libre Open Source Operating Systems](http://unifont.org/fontguide/).
+
+Finding a font that is both Unicode-friendly and pixel-friendly is not easy ; the best candidate yet is [unifont](http://unifoundry.com/unifont.html) (warning, due to a bad configuration of this web site's Apache server, when downloading a .gz file you end up with the original, uncompressed file stored on disk, yet still named with the .gz suffix), unfortunately it requires a height of 16 pixels to be legible.
+
+As font metrics are sometimes quite greedy in space, you can tweak the `twitter.baseline` parameter to remove some space from above the font baseline. Experiment freely.
+
 Development and debugging
 -------------------------
 
