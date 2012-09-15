@@ -224,8 +224,9 @@ class TweetFetcher(object):
 
             for tweet in twitter_stream.statuses.filter(track = self._track):
                 self._animation.queue_tweet(tweet)
-        except:
+        except Exception, e:
             print "Could not connect to Twitter, generating random tweets"
+            print "\t%s"%e
 
             for tweet in self._random():
                 self._animation.queue_tweet(tweet)

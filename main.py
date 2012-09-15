@@ -35,6 +35,9 @@ if __name__ == '__main__':
             speed = configuration.leddisplay.speed.required(),
             threaded = True
         )
+    except leddisplay.serial.SerialException, e:
+        print "Could not connect to serial port, launching display emulator"
+        print "\t%s"%e
     except:
         traceback.print_exc()
 
