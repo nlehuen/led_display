@@ -79,6 +79,8 @@ Tracking Twitter
 
 The code comes with a Twitter ticker animation. It uses the [Twitter streaming API](https://dev.twitter.com/docs/api/1.1/post/statuses/filter) to track tweets with a given set of keywords.
 
+![Twitter ticker screenshot](https://bitbucket.org/nlehuen/led_display/raw/b47ffffe02b8/twitter-screenshot.png)
+
 Have a look at the `twitter` section in `configuration-sample.json` for a sample configuration. The syntax for the `twitter.track` parameter in explained in the [Twitter API documentation](https://dev.twitter.com/docs/streaming-apis/parameters#track).
 
 The Twitter ticker animation requires a TrueType font to render text. "Pixel" fonts are of course recommended. Three small freeware fonts downloaded from [dafont.com](http://www.dafont.com/bitmap.php) are provided. Unfortunately they are more suited to Western language tweets, and you often get cyrillic, arabic or asian tweets when tracking popular keywords. Unicode fonts solve this problem, you can read about them in the [Unicode Font Guide For Free/Libre Open Source Operating Systems](http://unifont.org/fontguide/).
