@@ -40,7 +40,13 @@ if __name__ == '__main__':
 
     if display is None:
         import tkdisplay
-        display = tkdisplay.Display((32, 16), 8)
+        display = tkdisplay.Display(
+            (
+                configuration['tkdisplay']['width'],
+                configuration['tkdisplay']['height']
+            ),
+            configuration['tkdisplay']['scale']
+        )
 
     animator = animator.Animator(
         display,
@@ -59,20 +65,11 @@ if __name__ == '__main__':
             track = configuration['twitter']['track'],
             fps = configuration['twitter'].get('fps', 0),
             wait = configuration['twitter'].get('wait', 1),
+            speed = configuration['twitter'].get('speed', 1),
             font = configuration['twitter'].get('font', 'alterebro-pixel-font.ttf'),
             size = configuration['twitter'].get('size', 16),
             baseline = configuration['twitter'].get('baseline', 4)
         ))
-
-    animator.queue(animations.rainbow.RainbowWoooowAnimation())
-
-    animator.queue(animations.heartbeat.HeartBeatAnimation())
-
-    animator.queue(animations.bouncer.BouncerAnimation())
-
-    animator.queue(animations.radar.RadarAnimation(bots=3, rps = 5))
-
-    animator.queue(animations.fadetoblack.FadeToBlackAnimation(2))
 
     # For the moment, run the animator in the main thread
     animator.mainloop()

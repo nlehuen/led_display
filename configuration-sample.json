@@ -1,4 +1,9 @@
 {
+    "tkdisplay":{
+        "width":32,
+        "height":16,
+        "scale":8
+    },
     "leddisplay":{
         "port":"/dev/ttyUSB0",
         "speed":2000000
@@ -9,6 +14,7 @@
         "track":"whatever",
         "fps":0,
         "wait":2.5,
+        "speed":1,
         "font":"alterebro-pixel-font.ttf",
         "size":16,
         "baseline":4

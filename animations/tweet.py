@@ -19,10 +19,11 @@ from animator import Image, ImageDraw, ImageFont
 from colors import RAINBOW, RAINBOW_RGB
 
 class TweetAnimation(object):
-    def __init__(self, twitter_auth, track, fps, wait, font, size, baseline):
+    def __init__(self, twitter_auth, track, fps, wait, speed, font, size, baseline):
         self._fetcher = TweetFetcher(self, twitter_auth, track)
         self._fps = fps
         self._wait = wait
+        self._speed = speed
         self._font = ImageFont.truetype(font, size)
         self._baseline = baseline
 
@@ -116,7 +117,7 @@ class TweetAnimation(object):
             # Scroll the screen when the
             # last tweet ended up off screen.
             if scroll:
-                ox = ox - 1
+                ox = ox - self._speed
                 scroll = False
 
             # Begin drawing at origin on first line
