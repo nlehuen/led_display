@@ -67,6 +67,13 @@ Running the application
 python main.py
 ```
 
+Display emulator
+----------------
+
+If the serial port or display cannot be found, the `main.py` script emulates a display with a GUI window (using `Tkinter`). This means that you should be able to write and run animations without a LED display. It's less fun but it is much more practical when writing code on the go.
+
+![Emulator screenshot](https://bitbucket.org/nlehuen/led_display/raw/488c7223873d/emulator-screenshot.png)
+
 Tracking Twitter
 ----------------
 
@@ -80,15 +87,8 @@ Finding a font that is both Unicode-friendly and pixel-friendly is not easy ; th
 
 As font metrics are sometimes quite greedy in space, you can tweak the `twitter.baseline` parameter to remove some space from above the font baseline. Experiment freely.
 
-Development and debugging
--------------------------
-
-If the serial port or display cannot be found, the `main.py` script emulates a display with a GUI window (using `Tkinter`). This means that you should be able to write and run animations without a LED display. It's less fun but it is much more practical when writing code on the go.
-
-![Emulator screenshot](https://bitbucket.org/nlehuen/led_display/raw/488c7223873d/emulator-screenshot.png)
-
-Changing animations
--------------------
+Changing the sequence of animations
+-----------------------------------
 
 For the moment, the sequence of animations is hand-coded within the `main.py` script. You can change their order, add some or remove some by editing this script.
 
