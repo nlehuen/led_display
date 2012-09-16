@@ -14,10 +14,8 @@ from Tkinter import *
 class Display(object):
     def __init__(self, size, scale):
         self._size = size
-        if scale != 1:
-            self._resize = (size[0] * scale, size[1] * scale)
-        else:
-            self._resize = None
+        self._scale = scale
+        self._resize = (size[0] * scale, size[1] * scale)
 
         # This queue will hold at most 1 image to paint
         self._queue = deque(maxlen=1)
@@ -25,12 +23,20 @@ class Display(object):
         # Create GUI
         self._root = Tk()
         self._root.title("Emulator")
-        self._label = Label(self._root, text = "Hello, world !")
+        self._label = Label(self._root,
+            text = "Launching animation...",
+            width = self._resize[0],
+            height = self._resize[1]
+        )
         self._label.pack()
 
         # Set the update loop to start as soon
         # as the main loop is launched
         self._root.after(0, self._update)
+
+        # Set the window closed handler
+        self._closed = False
+        self._root.protocol("WM_DELETE_WINDOW", self.close)
 
         # Launch main loop
         self._mainLoop = threading.Thread(name="TkLoop", target=self._root.mainloop)
@@ -40,10 +46,19 @@ class Display(object):
         return self._size
 
     def send_image(self, img):
-        if self._resize is not None:
+        if self._closed:
+            # It's a bit of a hack but after all, closing the window
+            # could be done through the keyboard :)
+            raise KeyboardInterrupt("Emulator was closed")
+
+        if self._scale != 1:
             img = img.resize(self._resize)
 
         self._queue.append(ImageTk.PhotoImage(img))
+
+    def close(self):
+        self._closed = True
+        self._root.quit()
 
     def _update(self):
         try:
@@ -59,4 +74,5 @@ class Display(object):
             pass
 
         # Loop within the Tkinter main loop
-        self._root.after(20, self._update) # 50 FPS
+        # 100 FPS max
+        self._root.after(10, self._update)

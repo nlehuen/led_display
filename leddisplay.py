@@ -11,6 +11,7 @@ class Display(object):
 
         if threaded:
             self._queue = Queue(1)
+            self._keepgoing = True
             self._thread = threading.Thread(name="LEDDisplay", target=self._run)
             self._thread.daemon = True
             self._thread.start()
@@ -41,7 +42,10 @@ class Display(object):
                 # Silently drops images if the screen cannot keep up
                 pass
 
+    def close(self):
+        self._keepgoing = False
+
     def _run(self):
-        while True:
+        while self._keepgoing:
             data = self._queue.get()
             self._serial.write(data)

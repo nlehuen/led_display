@@ -97,4 +97,7 @@ if __name__ == '__main__':
             print "twitter.auth.oauth authentication informations."
 
     # For the moment, run the animator in the main thread
-    animator.mainloop()
+    try:
+        animator.mainloop()
+    finally:
+        display.close()

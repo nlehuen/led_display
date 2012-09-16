@@ -69,6 +69,9 @@ class Animator(object):
             # Start frame generator, protecting the animator against exceptions
             try:
                 self._animation_generator = self._animation.animate(self, self._img, self._draw)
+            except KeyboardInterrupt:
+                # Quit if Ctrl+C was pressed
+                return False
             except:
                 traceback.print_exc()
                 self._animation = None
@@ -118,6 +121,9 @@ class Animator(object):
                 try:
                     if yielded is None or yielded is True:
                         self._display.send_image(self._img)
+                except KeyboardInterrupt:
+                    # Quit if Ctrl+C was pressed
+                    return False
                 except:
                     # If the display is broken, stop
                     # the animator
@@ -129,6 +135,9 @@ class Animator(object):
             except StopIteration:
                 self._animation = None
                 self._animation_generator = None
+            except KeyboardInterrupt:
+                # Quit if Ctrl+C was pressed
+                return False
             except:
                 traceback.print_exc()
                 self._animation = None
@@ -138,6 +147,9 @@ class Animator(object):
                 # Close the generator, this sends a GeneratorExit
                 # into the animate() method.
                 self._animation_generator.close()
+            except KeyboardInterrupt:
+                # Quit if Ctrl+C was pressed
+                return False
             except:
                 traceback.print_exc()
             self._animation = None
