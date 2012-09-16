@@ -19,13 +19,41 @@ from animator import Image, ImageDraw, ImageFont
 from colors import RAINBOW, RAINBOW_RGB
 
 class TweetAnimation(object):
-    def __init__(self, twitter_auth, track, fps, wait, speed, font, size, baseline):
-        self._fetcher = TweetFetcher(self, twitter_auth, track)
-        self._fps = fps
-        self._wait = wait
-        self._speed = speed
-        self._font = ImageFont.truetype(font, size)
-        self._baseline = baseline
+    def __init__(self, configuration):
+        twitter_auth = None
+
+        # First, try to use the basic authentication
+        auth_config = configuration.auth.basic
+        if auth_config.exists():
+            twitter_auth = UserPassAuth(
+                auth_config.login.required(),
+                auth_config.password.required()
+            )
+
+        # If basic authentication was not found, try OAuth
+        if twitter_auth is None:
+            auth_config = configuration.auth.oauth
+            if auth_config.exists():
+                twitter_auth = OAuth(
+                    auth_config.oauth_token.required(),
+                    auth_config.oauth_secret.required(),
+                    auth_config.consumer_key.required(),
+                    auth_config.consumer_secret.required(),
+                )
+
+        self._fetcher = TweetFetcher(
+            self,
+            twitter_auth,
+            configuration.track.required()
+        )
+        self._fps = configuration.fps.value(0)
+        self._wait = configuration.wait.value(1)
+        self._speed = configuration.speed.value(1)
+        self._font = ImageFont.truetype(
+            configuration.font.value('fonts/alterebro-pixel-font.ttf'),
+            configuration.size.value(16)
+        )
+        self._baseline = configuration.baseline.value(4)
 
         self._tweet_queue = deque(maxlen=128)
         self._image_queue = deque(maxlen=128)
