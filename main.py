@@ -50,16 +50,8 @@ if __name__ == '__main__':
     # Create the animator
     animator = animator.Animator(
         display,
-        queue=configuration.animator.queue.value(120),
-        fps=configuration.animator.fps.value(25)
+        configuration.animator
     )
-
-    # Fill the animation queue
-    # TODO : fill it from the configuration file
-    for i, anim in configuration.animator.animations:
-        module = importlib.import_module(anim.module.required())
-        animation = module.build_animation(anim)
-        animator.queue(animation)
 
     # For the moment, run the animator in the main thread
     try:

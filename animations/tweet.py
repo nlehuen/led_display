@@ -138,92 +138,95 @@ class TweetAnimation(object):
         # No need to scroll at first
         scroll = False
 
-        while self._duration == 0 or animator.t < self._duration:
-            # The iterator built by self._images() takes care
-            # of the image queue, generating new images from tweets
-            # as needed.
-            image_iterator = self._images()
+        try:
+            while self._duration == 0 or animator.t < self._duration:
+                # The iterator built by self._images() takes care
+                # of the image queue, generating new images from tweets
+                # as needed.
+                image_iterator = self._images()
 
-            # pop will tell us how many image we must remove
-            # from left
-            pop = 0
+                # pop will tell us how many image we must remove
+                # from left
+                pop = 0
 
-            try:
-                start = time.time()
+                try:
+                    start = time.time()
 
-                # Get first image
-                timg = image_iterator.next()
+                    # Get first image
+                    timg = image_iterator.next()
 
-                # Scroll the screen when the
-                # last tweet ended up off screen.
-                if scroll:
-                    # Make sure that the origin aligns the image on its boundary
-                    # should the speed parameter make it go further
-                    ox = max(ox - self._speed, -timg.size[0])
-                    scroll = False
+                    # Scroll the screen when the
+                    # last tweet ended up off screen.
+                    if scroll:
+                        # Make sure that the origin aligns the image on its boundary
+                        # should the speed parameter make it go further
+                        ox = max(ox - self._speed, -timg.size[0])
+                        scroll = False
 
-                # Begin drawing at origin on first line
-                x = ox
-                y = 0
+                    # Begin drawing at origin on first line
+                    x = ox
+                    y = 0
 
-                while True:
-                    # We drop images that are off the first line entirely
-                    if x + timg.size[0] <= 0 and y == 0:
-                        # Mark this image for later drop
-                        # (iterator on deque doesn't support concurrent modifications)
-                        pop = pop + 1
+                    while True:
+                        # We drop images that are off the first line entirely
+                        if x + timg.size[0] <= 0 and y == 0:
+                            # Mark this image for later drop
+                            # (iterator on deque doesn't support concurrent modifications)
+                            pop = pop + 1
 
-                        # Move drawing point AND origin accordingly
+                            # Move drawing point AND origin accordingly
+                            x = x + timg.size[0]
+                            ox = ox + timg.size[0]
+
+                            # Retry with next image
+                            timg = image_iterator.next()
+                            continue
+
+                        # Paste the current image
+                        img.paste(timg, (x, y))
+
+                        # Move the cursor
                         x = x + timg.size[0]
-                        ox = ox + timg.size[0]
 
-                        # Retry with next image
-                        timg = image_iterator.next()
-                        continue
+                        # If end of image reached within the screen,
+                        # get the next image to paint
+                        if x < size[0]:
+                            timg = image_iterator.next()
+                        else:
+                            # The current image does not fit on the screen,
+                            # so wrap it up on the next line
+                            x = - ( size[0] - (x - timg.size[0]))
+                            y = y + timg.size[1]
 
-                    # Paste the current image
-                    img.paste(timg, (x, y))
+                            # End drawing if all vertical spaced
+                            # is used
+                            if y > img.size[1]:
+                                scroll = True
+                                break
 
-                    # Move the cursor
-                    x = x + timg.size[0]
+                except StopIteration:
+                    pass
 
-                    # If end of image reached within the screen,
-                    # get the next image to paint
-                    if x < size[0]:
-                        timg = image_iterator.next()
-                    else:
-                        # The current image does not fit on the screen,
-                        # so wrap it up on the next line
-                        x = - ( size[0] - (x - timg.size[0]))
-                        y = y + timg.size[1]
+                # Sleep a bit
+                # Note that if this FPS setting is bigger than for the animator,
+                # the animator will win.
+                if self._fps > 0:
+                    wait = (1.0 / self._fps) - (time.time() - start)
+                    if wait > 0:
+                        time.sleep(wait)
 
-                        # End drawing if all vertical spaced
-                        # is used
-                        if y > img.size[1]:
-                            scroll = True
-                            break
+                # Send image
+                yield True
 
-            except StopIteration:
-                pass
+                # Pop tweets that are no longer needed
+                if pop > 0:
+                    for i in range(pop):
+                        self._image_queue.popleft()
 
-            # Sleep a bit
-            # Note that if this FPS setting is bigger than for the animator,
-            # the animator will win.
-            if self._fps > 0:
-                wait = (1.0 / self._fps) - (time.time() - start)
-                if wait > 0:
-                    time.sleep(wait)
-
-            # Send image
-            yield True
-
-            # Pop tweets that are no longer needed
-            if pop > 0:
-                for i in range(pop):
-                    self._image_queue.popleft()
-
-                # Wait for 2 seconds once at least an image has been popped
-                yield self._wait
+                    # Wait for 2 seconds once at least an image has been popped
+                    yield self._wait
+        finally:
+            self._fetcher.stop()
 
 class TweetFetcher(object):
     def __init__(self, animation, twitter_auth, track):
@@ -235,9 +238,15 @@ class TweetFetcher(object):
         # Launch Twitter stream fetcher
         self._thread = threading.Thread(name = "TweetFetcher", target = self._run)
         self._thread.daemon = True
+        self._keepgoing = True
         self._thread.start()
 
+    def stop(self):
+        self._keepgoing = False
+
     def _run(self):
+        iterator = None
+
         try:
             twitter_stream = TwitterStream(auth = self._twitter_auth)
 
@@ -249,14 +258,20 @@ class TweetFetcher(object):
                 text = "tracking \"%s\""%self._track
             ))
 
-            for tweet in twitter_stream.statuses.filter(track = self._track):
-                self._animation.queue_tweet(tweet)
+            iterator = iter(twitter_stream.statuses.filter(track = self._track))
+
         except Exception, e:
             print "Could not connect to Twitter, generating random tweets"
             print "\t%s"%e
 
-            for tweet in self._random():
-                self._animation.queue_tweet(tweet)
+            iterator = self._random()
+
+        try:
+            while self._keepgoing:
+                self._animation.queue_tweet(iterator.next())
+            iterator.close()
+        except StopIteration:
+            pass
 
     def _random(self):
         id_chars = u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -269,7 +284,7 @@ class TweetFetcher(object):
                 result.append(random.choice(source))
             return "".join(result)
 
-        while True:
+        while self._keepgoing:
             tweet = dict(
                 user = dict(
                     screen_name = random_string(id_chars, 12)

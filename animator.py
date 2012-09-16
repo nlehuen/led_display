@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import importlib
 import threading
 import time
 import traceback
-from Queue import Queue
+from collections import deque
 
 try:
     # in case of easy_installed PIL
@@ -13,13 +14,16 @@ except ImportError:
     from PIL import Image, ImageDraw, ImageFont
 
 class Animator(object):
-    def __init__(self, display, queue=0, fps=20):
+    def __init__(self, display, configuration):
         self._display = display
-        self._queue = Queue(queue)
+        self._configuration = configuration
+
+        self._queue = deque(maxlen = configuration.queue.value(0))
+        self._loop = configuration.loop.value(True)
         self._animation = None
         self._animation_generator = None
-        self._fps = fps
-        self._wait = 1.0 / fps
+        self._fps = configuration.fps.value(25)
+        self._wait = 1.0 / self._fps
 
         # Prepare image and draw surface
         self._img = Image.new("RGB", self._display.size())
@@ -40,9 +44,9 @@ class Animator(object):
         "Wait for the animator to end."
         self._thread.join()
 
-    def queue(self, animation, block=True, timeout=0):
-        "Enqueue an animation. block and timeout have the same meaning as in the Queue.Queue.put method."
-        return self._queue.put(animation, block, timeout)
+    def queue(self, animation):
+        "Enqueue an animation."
+        return self._queue.append(animation)
 
     def wave(self, period):
         "Return a triangular wave signal from 0 to period-1"
@@ -53,8 +57,17 @@ class Animator(object):
         faded = Image.eval(self._img, lambda x : x * factor)
         self._img.paste(faded)
 
+    def build_animations_from_configuration(self):
+        for i, anim in self._configuration.animations:
+            module = importlib.import_module(anim.module.required())
+            animation = module.build_animation(anim)
+            self.queue(animation)
+
     def mainloop(self):
         "Main loop"
+
+        self.build_animations_from_configuration()
+
         keep_going = True
         while keep_going:
             keep_going = self.tick()
@@ -63,7 +76,14 @@ class Animator(object):
         "One animation step"
         if self._animation is None:
             # Get next animation
-            self._animation = self._queue.get(True, None)
+            try:
+                self._animation = self._queue.popleft()
+            except IndexError:
+                if self._loop:
+                    self.build_animations_from_configuration()
+                    return True
+                else:
+                    return False
 
             # Start frame generator, protecting the animator against exceptions
             try:

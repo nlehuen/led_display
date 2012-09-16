@@ -14,7 +14,7 @@ class HeartBeatAnimation(object):
 
         hb = random.randint(0,size[1]-1)
 
-        while self._duration == 0 or animator.t < self._duration:
+        while True:
             # Generate heart beat
             heartbeat = [hb]
             for i in range(1, size[0]):
@@ -26,6 +26,10 @@ class HeartBeatAnimation(object):
 
             # Draw heartbeat
             for i, hb in enumerate(heartbeat):
+                # Get out if timeout reached
+                if self._duration > 0 and animator.t >= self._duration:
+                    return
+
                 # Fade screen
                 animator.fade(0.95)
 
@@ -36,5 +40,5 @@ class HeartBeatAnimation(object):
 
 def build_animation(configuration):
     return HeartBeatAnimation(
-        duration = configuration.duration
+        duration = configuration.duration.value(0)
     )

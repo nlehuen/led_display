@@ -11,11 +11,12 @@
     "animator":{
         "queue":256,
         "fps":25,
+        "loop":true,
         "animations": [
             {"module":"animations.rainbow", "duration":30.0},
             {
                 "module": "animations.tweet",
-                "duration": 0,
+                "duration": 30.0,
                 "auth":{
                     "basic":{
                         "login":"XXXXXX",
@@ -35,7 +36,8 @@
                 "font":"fonts/alterebro-pixel-font.ttf",
                 "size":16,
                 "baseline":4
-            }
+            },
+            {"module":"animations.heartbeat", "duration":30.0}
         ]
     }
 }
