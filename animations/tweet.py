@@ -12,6 +12,7 @@ import time
 import random
 import traceback
 from collections import deque
+import json
 
 from twitter import Twitter, TwitterStream, OAuth, UserPassAuth
 
@@ -20,30 +21,31 @@ from colors import RAINBOW, RAINBOW_RGB
 
 class TweetAnimation(object):
     def __init__(self, configuration):
-        twitter_auth = None
-
         # First, try to use the basic authentication
         auth_config = configuration.auth.basic
         if auth_config.exists():
-            twitter_auth = UserPassAuth(
+            basic_auth = UserPassAuth(
                 auth_config.login.required(),
                 auth_config.password.required()
             )
+        else:
+            basic_auth = None
 
-        # If basic authentication was not found, try OAuth
-        if twitter_auth is None:
-            auth_config = configuration.auth.oauth
-            if auth_config.exists():
-                twitter_auth = OAuth(
-                    auth_config.oauth_token.required(),
-                    auth_config.oauth_secret.required(),
-                    auth_config.consumer_key.required(),
-                    auth_config.consumer_secret.required(),
-                )
+        auth_config = configuration.auth.oauth
+        if auth_config.exists():
+            oauth = OAuth(
+                auth_config.oauth_token.required(),
+                auth_config.oauth_secret.required(),
+                auth_config.consumer_key.required(),
+                auth_config.consumer_secret.required(),
+            )
+        else:
+            oauth = None
 
         self._fetcher = TweetFetcher(
             self,
-            twitter_auth,
+            basic_auth,
+            oauth,
             configuration.track.required()
         )
         self._duration = configuration.duration.value(0)
@@ -69,10 +71,12 @@ class TweetAnimation(object):
     def _generate_tweet_image(self, tweet):
         try:
             # Get strings from tweet
-            author = '@' + tweet['user']['screen_name']
+            author = '@' + (tweet.get('from_user') or tweet['user']['screen_name'])
             text = tweet['text']
         except KeyError:
             # Malformed tweet (e.g. tweet deletion)
+            print "Bad format for tweet :"
+            print json.dumps(tweet, indent=True)
             return None
 
         # Compute text metrics
@@ -140,6 +144,8 @@ class TweetAnimation(object):
 
         try:
             while self._duration == 0 or animator.t < self._duration:
+                animator.fade()
+
                 # The iterator built by self._images() takes care
                 # of the image queue, generating new images from tweets
                 # as needed.
@@ -191,6 +197,10 @@ class TweetAnimation(object):
                         # If end of image reached within the screen,
                         # get the next image to paint
                         if x < size[0]:
+                            # Scroll if some part of the image was offscreen
+                            if y + timg.size[1] > size[1]:
+                                scroll = True
+
                             timg = image_iterator.next()
                         else:
                             # The current image does not fit on the screen,
@@ -200,7 +210,7 @@ class TweetAnimation(object):
 
                             # End drawing if all vertical spaced
                             # is used
-                            if y > img.size[1]:
+                            if y > size[1]:
                                 scroll = True
                                 break
 
@@ -228,10 +238,37 @@ class TweetAnimation(object):
         finally:
             self._fetcher.stop()
 
+def chain(i1, i2):
+    # itertools.chain does not support the close() method
+
+    _i1 = None
+    _i2 = None
+
+    try:
+
+        if i1 is not None:
+            _i1 = iter(i1)
+            for v in _i1:
+                yield v
+            _i1 = None
+
+        if i2 is not None:
+            _i2 = iter(i2)
+            for v in _i2:
+                yield v
+            _i2 = None
+
+    except GeneratorExit:
+        if _i1 is not None:
+            _i1.close()
+        if _i2 is not None:
+            _i2.close()
+
 class TweetFetcher(object):
-    def __init__(self, animation, twitter_auth, track):
+    def __init__(self, animation, basic_auth, oauth, track):
         self._animation = animation
-        self._twitter_auth = twitter_auth
+        self._basic_auth = basic_auth
+        self._oauth = oauth
         self._track = track
 
     def start(self):
@@ -247,18 +284,29 @@ class TweetFetcher(object):
     def _run(self):
         iterator = None
 
+        # Display what is going to be tracked
+        self._animation.queue_tweet(dict(
+            user = dict(
+                screen_name = 'this_display'
+            ),
+            text = "tracking \"%s\""%self._track
+        ))
+
         try:
-            twitter_stream = TwitterStream(auth = self._twitter_auth)
+            if self._oauth:
+                twitter = Twitter(domain="search.twitter.com", auth = self._oauth)
+                i1 = twitter.search(q = self._track)
+                i1 = i1['results']
+            else:
+                i1 = None
 
-            # Display what is going to be tracked
-            self._animation.queue_tweet(dict(
-                user = dict(
-                    screen_name = 'this_display'
-                ),
-                text = "tracking \"%s\""%self._track
-            ))
+            if self._basic_auth:
+                twitter_stream = TwitterStream(auth = self._basic_auth)
+                i2 = twitter_stream.statuses.filter(track = self._track)
+            else:
+                i2 = None
 
-            iterator = iter(twitter_stream.statuses.filter(track = self._track))
+            iterator = chain(i1, i2)
 
         except Exception, e:
             print "Could not connect to Twitter, generating random tweets"
