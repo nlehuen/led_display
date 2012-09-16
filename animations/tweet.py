@@ -73,6 +73,8 @@ class TweetAnimation(object):
             # Get strings from tweet
             author = '@' + (tweet.get('from_user') or tweet['user']['screen_name'])
             text = tweet['text']
+            text = text.replace('&gt;', '>').replace('&lt;', '<').replace('&amp;', '&')
+
         except KeyError:
             # Malformed tweet (e.g. tweet deletion)
             print "Bad format for tweet :"
