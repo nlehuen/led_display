@@ -29,28 +29,32 @@ rainbows = [
 ]
 
 class RainbowWoooowAnimation(object):
+    def __init__(self, duration):
+        self._duration = duration
+
     def animate(self, animator, img, draw):
         size = img.size
 
         last_t = -100
-        try:
-            while True:
-                # Change rainbow every 8 seconds
-                if animator.t - last_t > 8:
-                    rainbow_function = random.choice(rainbows)
-                    last_t = animator.t
+        while self._duration == 0 or animator.t < self._duration:
+            # Change rainbow every 8 seconds
+            if animator.t - last_t > 8:
+                rainbow_function = random.choice(rainbows)
+                last_t = animator.t
 
-                # Example using Image.putdata instead of multiple
-                # Image.putpixel or ImageDraw.point calls
-                rainbow = [
-                    rainbow_function(animator, x, y)
-                    for y in range(size[1])
-                    for x in range(size[0])
-                ]
-                img.putdata(rainbow)
+            # Example using Image.putdata instead of multiple
+            # Image.putpixel or ImageDraw.point calls
+            rainbow = [
+                rainbow_function(animator, x, y)
+                for y in range(size[1])
+                for x in range(size[0])
+            ]
+            img.putdata(rainbow)
 
-                # Send image
-                yield
-        finally:
-            # Put this animation back into the queue
-            animator.queue(self)
+            # Send image
+            yield
+
+def build_animation(configuration):
+    return RainbowWoooowAnimation(
+        duration = configuration.duration.value(0)
+    )

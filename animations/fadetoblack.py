@@ -4,15 +4,19 @@ import math
 import random
 
 class FadeToBlackAnimation(object):
-    def __init__(self, duration = 3.0):
+    def __init__(self, duration, factor):
         self._duration = duration
+        self._factor = factor
 
     def animate(self, animator, img, draw):
-        try:
-            while animator.t < self._duration:
-                # Fade screen
-                animator.fade(0.9)
+        while self._duration == 0 or animator.t < self._duration:
+            # Fade screen
+            animator.fade(self._factor)
 
-                yield
-        finally:
-            animator.queue(self)
+            yield
+
+def build_animation(configuration):
+    return FadeToBlackAnimation(
+        duration = configuration.duration.value(3),
+        factor = configuration.factor.value(0.9)
+    )

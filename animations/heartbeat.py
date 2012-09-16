@@ -6,30 +6,35 @@ import random
 from colors import RAINBOW
 
 class HeartBeatAnimation(object):
+    def __init__(self, duration):
+        self._duration = duration
+
     def animate(self, animator, img, draw):
         size = img.size
 
-        try:
-            hb = random.randint(0,size[1]-1)
+        hb = random.randint(0,size[1]-1)
 
-            while True:
-                # Generate heart beat
-                heartbeat = [hb]
-                for i in range(1, size[0]):
-                    delta = random.uniform(0, 2) - 1.0
-                    hb = hb + delta
-                    if hb < 0 or hb >= size[1]:
-                        hb = hb - 2 * delta
-                    heartbeat.append(hb)
+        while self._duration == 0 or animator.t < self._duration:
+            # Generate heart beat
+            heartbeat = [hb]
+            for i in range(1, size[0]):
+                delta = random.uniform(0, 2) - 1.0
+                hb = hb + delta
+                if hb < 0 or hb >= size[1]:
+                    hb = hb - 2 * delta
+                heartbeat.append(hb)
 
-                # Draw heartbeat
-                for i, hb in enumerate(heartbeat):
-                    # Fade screen
-                    animator.fade(0.95)
+            # Draw heartbeat
+            for i, hb in enumerate(heartbeat):
+                # Fade screen
+                animator.fade(0.95)
 
-                    # Draw the point
-                    draw.point((i, hb), fill=RAINBOW[int(hb * len(RAINBOW) / size[1])])
+                # Draw the point
+                draw.point((i, hb), fill=RAINBOW[int(hb * len(RAINBOW) / size[1])])
 
-                    yield
-        finally:
-            animator.queue(self)
+                yield
+
+def build_animation(configuration):
+    return HeartBeatAnimation(
+        duration = configuration.duration
+    )

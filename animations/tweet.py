@@ -46,6 +46,7 @@ class TweetAnimation(object):
             twitter_auth,
             configuration.track.required()
         )
+        self._duration = configuration.duration.value(0)
         self._fps = configuration.fps.value(0)
         self._wait = configuration.wait.value(1)
         self._speed = configuration.speed.value(1)
@@ -137,7 +138,7 @@ class TweetAnimation(object):
         # No need to scroll at first
         scroll = False
 
-        while True:
+        while self._duration == 0 or animator.t < self._duration:
             # The iterator built by self._images() takes care
             # of the image queue, generating new images from tweets
             # as needed.
@@ -278,3 +279,5 @@ class TweetFetcher(object):
             yield tweet
             time.sleep(random.uniform(0,1))
 
+def build_animation(configuration):
+    return TweetAnimation(configuration)

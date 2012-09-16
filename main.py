@@ -7,12 +7,7 @@ import json
 from configuration import Configuration
 import animator
 
-# Animations
-import animations.rainbow
-import animations.radar
-import animations.fadetoblack
-import animations.bouncer
-import animations.heartbeat
+import importlib
 
 # Try to load Twitter animations
 try:
@@ -56,14 +51,15 @@ if __name__ == '__main__':
     animator = animator.Animator(
         display,
         queue=configuration.animator.queue.value(120),
-        fps=configuration.animator.fps.value(25),
-        animation_timeout=configuration.animator.timeout.value(30)
+        fps=configuration.animator.fps.value(25)
     )
 
     # Fill the animation queue
     # TODO : fill it from the configuration file
-    if animations.tweet is not None:
-        animator.queue(animations.tweet.TweetAnimation(configuration.twitter))
+    for i, anim in configuration.animator.animations:
+        module = importlib.import_module(anim.module.required())
+        animation = module.build_animation(anim)
+        animator.queue(animation)
 
     # For the moment, run the animator in the main thread
     try:

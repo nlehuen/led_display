@@ -48,9 +48,10 @@ class Bot(object):
                 return (x, y)
 
 class RadarAnimation(object):
-    def __init__(self, bots=2, rps = 3.0):
+    def __init__(self, bots, rps, duration):
         self._bots = bots
         self._rps = rps
+        self._duration = duration
 
     def animate(self, animator, img, draw):
         size = img.size
@@ -62,39 +63,43 @@ class RadarAnimation(object):
             for b in range(self._bots)
         ]
 
-        try:
-            while True:
-                # Fade screen
-                animator.fade(0.9)
+        while self._duration == 0 or animator.t < self._duration:
+            # Fade screen
+            animator.fade(0.9)
 
-                # Draw the radar line
-                # One full rotation in self._rps seconds
-                angle = 2 * math.pi * animator.t / self._rps
-                to = (
-                    center[0] + radius * math.cos(angle),
-                    center[1] + radius * math.sin(angle)
-                )
-                draw.line((center, to), fill="#007700")
+            # Draw the radar line
+            # One full rotation in self._rps seconds
+            angle = 2 * math.pi * animator.t / self._rps
+            to = (
+                center[0] + radius * math.cos(angle),
+                center[1] + radius * math.sin(angle)
+            )
+            draw.line((center, to), fill="#007700")
 
-                def visible(a, b, limit):
-                    # Custom made visibility algo :
-                    # Vector coordinates have the same sign
-                    # and norm of vectorial product is less than a limit
-                    # (which means both vectors are nearly colinear)
-                    # Normally |u x v| = |u| . |v| . sin(angle(u, v))
-                    # Therefore if the angle is small enough, |u x v| is small
-                    u1 = a[0] - center[0]
-                    u2 = b[0] - center[0]
-                    v1 = a[1] - center[1]
-                    v2 = b[1] - center[1]
-                    mul = abs(u1 * v2 - u2 * v1) # |u x v| if u and v are on the same (X,Y) plane
-                    return 0 <= u1*u2 and 0 <= v1*v2 and 0 <= mul and mul <= limit
+            def visible(a, b, limit):
+                # Custom made visibility algo :
+                # Vector coordinates have the same sign
+                # and norm of vectorial product is less than a limit
+                # (which means both vectors are nearly colinear)
+                # Normally |u x v| = |u| . |v| . sin(angle(u, v))
+                # Therefore if the angle is small enough, |u x v| is small
+                u1 = a[0] - center[0]
+                u2 = b[0] - center[0]
+                v1 = a[1] - center[1]
+                v2 = b[1] - center[1]
+                mul = abs(u1 * v2 - u2 * v1) # |u x v| if u and v are on the same (X,Y) plane
+                return 0 <= u1*u2 and 0 <= v1*v2 and 0 <= mul and mul <= limit
 
-                # Draw the bots
-                pos = [bot.pos(animator.t) for bot in bots]
-                pos = [bot for bot in pos if visible(bot, to, 25)]
-                draw.point(pos, fill="#ffffff")
+            # Draw the bots
+            pos = [bot.pos(animator.t) for bot in bots]
+            pos = [bot for bot in pos if visible(bot, to, 25)]
+            draw.point(pos, fill="#ffffff")
 
-                yield
-        finally:
-            animator.queue(self)
+            yield
+
+def build_animation(configuration):
+    return RadarAnimation(
+        bots = configuration.bots.value(3),
+        rps = configuration.rps.value(3.0),
+        duration = configuration.duration.value(0)
+    )

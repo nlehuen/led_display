@@ -57,8 +57,9 @@ class Bot(object):
 
 
 class BouncerAnimation(object):
-    def __init__(self, bots=10):
+    def __init__(self, bots, duration):
         self._bots = bots
+        self._duration = duration
 
     def animate(self, animator, img, draw):
         size = img.size
@@ -68,15 +69,18 @@ class BouncerAnimation(object):
             for b in range(self._bots)
         ]
 
-        try:
-            while True:
-                # Fade screen
-                animator.fade(0.7)
+        while self._duration == 0 or animator.t < self._duration:
+            # Fade screen
+            animator.fade(0.7)
 
-                # Draw the bots
-                pos = [bot.pos(animator.t) for bot in bots]
-                draw.point(pos, fill="#ffffff")
+            # Draw the bots
+            pos = [bot.pos(animator.t) for bot in bots]
+            draw.point(pos, fill="#ffffff")
 
-                yield
-        finally:
-            animator.queue(self)
+            yield
+
+def build_animation(configuration):
+    return BouncerAnimation(
+        bots = configuration.bots.value(10),
+        duration = configuration.duration.value(0)
+    )

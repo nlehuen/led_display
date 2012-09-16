@@ -33,6 +33,16 @@ class Configuration(object):
             node = node._parent
         return '.'.join(result)
 
+    def __iter__(self):
+        if self._value is NOTHING:
+            return
+        if isinstance(self._value, list):
+            for i, v in enumerate(self._value):
+                yield i, Configuration(self, str(i), v)
+        if isinstance(self._value, dict):
+            for k, v in self._value.iteritems():
+                yield k, Configuration(self, k, v)
+
     def value(self, default=None):
         if self._value is NOTHING:
             return default

@@ -13,14 +13,13 @@ except ImportError:
     from PIL import Image, ImageDraw, ImageFont
 
 class Animator(object):
-    def __init__(self, display, queue=0, fps=20, animation_timeout=15.0):
+    def __init__(self, display, queue=0, fps=20):
         self._display = display
         self._queue = Queue(queue)
         self._animation = None
         self._animation_generator = None
         self._fps = fps
         self._wait = 1.0 / fps
-        self._animation_timeout = animation_timeout
 
         # Prepare image and draw surface
         self._img = Image.new("RGB", self._display.size())
@@ -86,72 +85,57 @@ class Animator(object):
         self.now = time.time()
         self.t = self.now - self.start_time
 
-        # If there are other animations in the queue, kill this one once it
-        # has been displayed for 15 seconds ; otherwise the animation will keep running
-        # until it tells the Animator that it is over.
-        keep_going = self._queue.empty() or self.t <= self._animation_timeout
+        try:
+            # Have the animation generate the next frame
+            yielded = self._animation_generator.next()
 
-        if keep_going:
+            # Adjust wait time to maintain fixed frame rate
+            # This assumes that sending the image to the display
+            # is done at a fixed rate
+            now = time.time()
+            wait = self._wait - (now - self.last_frame)
+
+            # If the animation yielded a number,
+            # it's a number of seconds to wait on this frame.
+            # Here we use a trick in order to skip using isinstance(send, numbers.Number)
+            if yielded is not True:
+                # max(None, x) == x
+                # max(False, x) == x if x != 0
+                # max(True, x) == True
+                wait = max(yielded, wait)
+
+            # Now wait if we have to.
+            if wait > 0:
+                time.sleep(wait)
+                self.last_frame = time.time()
+            else:
+                self.last_frame = now
+
+            # Display next animation frame
             try:
-                # Have the animation generate the next frame
-                yielded = self._animation_generator.next()
-
-                # Adjust wait time to maintain fixed frame rate
-                # This assumes that sending the image to the display
-                # is done at a fixed rate
-                now = time.time()
-                wait = self._wait - (now - self.last_frame)
-
-                # If the animation yielded a number,
-                # it's a number of seconds to wait on this frame.
-                # Here we use a trick in order to skip using isinstance(send, numbers.Number)
-                if yielded is not True:
-                    # max(None, x) == x
-                    # max(False, x) == x if x != 0
-                    # max(True, x) == True
-                    wait = max(yielded, wait)
-
-                if wait > 0:
-                    time.sleep(wait)
-                    self.last_frame = time.time()
-                else:
-                    self.last_frame = now
-
-                # Display next animation frame
-                try:
-                    if yielded is None or yielded is True:
-                        self._display.send_image(self._img)
-                except KeyboardInterrupt:
-                    # Quit if Ctrl+C was pressed
-                    return False
-                except:
-                    # If the display is broken, stop
-                    # the animator
-                    traceback.print_exc()
-                    return False
-
-                # Increment frame count
-                self.i = self.i + 1
-            except StopIteration:
-                self._animation = None
-                self._animation_generator = None
+                if yielded is None or yielded is True:
+                    self._display.send_image(self._img)
             except KeyboardInterrupt:
                 # Quit if Ctrl+C was pressed
                 return False
             except:
+                # If the display is broken, stop
+                # the animator
                 traceback.print_exc()
-                self._animation = None
-                self._animation_generator = None
-        else:
-            try:
-                # Close the generator, this sends a GeneratorExit
-                # into the animate() method.
-                self._animation_generator.close()
-            except KeyboardInterrupt:
-                # Quit if Ctrl+C was pressed
                 return False
-            except:
-                traceback.print_exc()
+
+            # Increment frame count
+            self.i = self.i + 1
+        except StopIteration:
+            # End of the animator iterator
+            self._animation = None
+            self._animation_generator = None
+        except KeyboardInterrupt:
+            # Quit if Ctrl+C was pressed
+            return False
+        except:
+            # Other error, kill the animation
+            traceback.print_exc()
             self._animation = None
             self._animation_generator = None
 
