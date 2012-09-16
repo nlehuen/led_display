@@ -15,19 +15,46 @@ Copy `configuration-sample.json` into `configuration.json`, and modify settings 
 
 ```json
 {
+    "tkdisplay":{
+        "width":32,
+        "height":16,
+        "scale":8
+    },
     "leddisplay":{
         "port":"/dev/ttyUSB0",
         "speed":2000000
     },
-    "twitter":{
-        "login":"XXXXXX",
-        "password":"YYYYYY",
-        "track":"whatever"
-    },
     "animator":{
         "queue":256,
         "fps":25,
-        "timeout":30
+        "loop":true,
+        "animations": [
+            {"module":"animations.rainbow", "duration":30.0},
+            {
+                "module": "animations.tweet",
+                "duration": 30.0,
+                "auth":{
+                    "basic":{
+                        "login":"XXXXXX",
+                        "password":"YYYYYY"
+                    },
+                    "oauth":{
+                        "consumer_key":"",
+                        "consumer_secret":"",
+                        "oauth_token":"",
+                        "oauth_secret":""
+                    }
+                },
+                "track":"whatever",
+                "fps":0,
+                "wait":2.5,
+                "speed":1,
+                "font":"fonts/alterebro-pixel-font.ttf",
+                "size":16,
+                "baseline":4
+            },
+            {"module":"animations.heartbeat", "duration":30.0}
+        ]
     }
 }
 ```
