@@ -106,24 +106,10 @@ class TweetAnimation(object):
         # Origin of first line of text
         ox = 0
 
-        # (x,y) is the drawing point for the next image
-        x = ox
-        y = 0
-
         # No need to scroll at first
         scroll = False
 
         while True:
-            # Scroll the screen when the
-            # last tweet ended up off screen.
-            if scroll:
-                ox = ox - self._speed
-                scroll = False
-
-            # Begin drawing at origin on first line
-            x = ox
-            y = 0
-
             # The iterator built by self._images() takes care
             # of the image queue, generating new images from tweets
             # as needed.
@@ -138,6 +124,18 @@ class TweetAnimation(object):
 
                 # Get first image
                 timg = image_iterator.next()
+
+                # Scroll the screen when the
+                # last tweet ended up off screen.
+                if scroll:
+                    # Make sure that the origin aligns the image on its boundary
+                    # should the speed parameter make it go further
+                    ox = max(ox - self._speed, -timg.size[0])
+                    scroll = False
+
+                # Begin drawing at origin on first line
+                x = ox
+                y = 0
 
                 while True:
                     # We drop images that are off the first line entirely
