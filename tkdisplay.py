@@ -54,7 +54,7 @@ class Display(object):
         if self._scale != 1:
             img = img.resize(self._resize)
 
-        self._queue.append(ImageTk.PhotoImage(img))
+        self._queue.append(img)
 
     def close(self):
         self._closed = True
@@ -64,6 +64,9 @@ class Display(object):
         try:
             # Get the image to paint
             img = self._queue.popleft()
+
+            # Create PhotoImage from PIL image
+            img = ImageTk.PhotoImage(img)
 
             # Update the label
             self._label.config(image = img)
