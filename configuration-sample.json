@@ -25,7 +25,7 @@
         "fps":0,
         "wait":2.5,
         "speed":1,
-        "font":"alterebro-pixel-font.ttf",
+        "font":"fonts/alterebro-pixel-font.ttf",
         "size":16,
         "baseline":4
     },
