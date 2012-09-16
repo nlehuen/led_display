@@ -25,8 +25,7 @@ if __name__ == '__main__':
     # Load configuration
     configuration = Configuration.load('configuration.json')
 
-    # Create display and animator
-
+    # Try to connect to LED display through serial port
     display = None
     try:
         import leddisplay
@@ -41,6 +40,8 @@ if __name__ == '__main__':
     except:
         traceback.print_exc()
 
+    # If connection to LED display was not successfull,
+    # launch the emulator
     if display is None:
         import tkdisplay
         display = tkdisplay.Display(
@@ -51,6 +52,7 @@ if __name__ == '__main__':
             configuration.tkdisplay.scale.value(4)
         )
 
+    # Create the animator
     animator = animator.Animator(
         display,
         queue=configuration.animator.queue.value(120),
@@ -58,7 +60,8 @@ if __name__ == '__main__':
         animation_timeout=configuration.animator.timeout.value(30)
     )
 
-    # Animation queue
+    # Fill the animation queue
+    # TODO : fill it from the configuration file
     if animations.tweet is not None:
         animator.queue(animations.tweet.TweetAnimation(configuration.twitter))
 
