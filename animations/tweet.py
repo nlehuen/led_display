@@ -146,7 +146,8 @@ class TweetAnimation(object):
 
         try:
             while self._duration == 0 or animator.t < self._duration:
-                animator.fade()
+                # Clears the screen to erase last tweets trails
+                animator.clear()
 
                 # The iterator built by self._images() takes care
                 # of the image queue, generating new images from tweets

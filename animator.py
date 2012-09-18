@@ -52,6 +52,9 @@ class Animator(object):
         "Return a triangular wave signal from 0 to period-1"
         return abs(self.i%(period*2-2)-period+1)
 
+    def clear(self, color="#000000"):
+        self._draw.rectangle(((0,0), self._img.size), fill=color)
+
     def fade(self, factor = 0.9):
         "Fade the display to black by the given factor"
         faded = Image.eval(self._img, lambda x : x * factor)
