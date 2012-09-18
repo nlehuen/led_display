@@ -23,12 +23,12 @@ class Display(object):
         # Create GUI
         self._root = Tk()
         self._root.title("Emulator")
-        self._label = Label(self._root,
-            text = "Launching animation...",
+        self._canvas = Canvas(
+            self._root,
             width = self._resize[0],
             height = self._resize[1]
         )
-        self._label.pack()
+        self._canvas.pack()
 
         # Set the update loop to start as soon
         # as the main loop is launched
@@ -69,10 +69,10 @@ class Display(object):
             img = ImageTk.PhotoImage(img)
 
             # Update the label
-            self._label.config(image = img)
+            self._canvas.create_image(0, 0, image = img, anchor = NW)
 
             # Keep a reference to the image in the label
-            self._label._image = img
+            self._canvas._image = img
         except IndexError:
             pass
 
