@@ -21,16 +21,6 @@ from colors import RAINBOW, RAINBOW_RGB
 
 class TweetAnimation(object):
     def __init__(self, configuration):
-        # First, try to use the basic authentication
-        auth_config = configuration.auth.basic
-        if auth_config.exists():
-            basic_auth = UserPassAuth(
-                auth_config.login.required(),
-                auth_config.password.required()
-            )
-        else:
-            basic_auth = None
-
         auth_config = configuration.auth.oauth
         if auth_config.exists():
             oauth = OAuth(
@@ -44,7 +34,6 @@ class TweetAnimation(object):
 
         self._fetcher = TweetFetcher(
             self,
-            basic_auth,
             oauth,
             configuration.track.required()
         )
@@ -268,9 +257,8 @@ def chain(i1, i2):
             _i2.close()
 
 class TweetFetcher(object):
-    def __init__(self, animation, basic_auth, oauth, track):
+    def __init__(self, animation, oauth, track):
         self._animation = animation
-        self._basic_auth = basic_auth
         self._oauth = oauth
         self._track = track
 
@@ -303,8 +291,8 @@ class TweetFetcher(object):
             else:
                 i1 = None
 
-            if self._basic_auth:
-                twitter_stream = TwitterStream(auth = self._basic_auth)
+            if self._oauth:
+                twitter_stream = TwitterStream(auth = self._oauth)
                 i2 = twitter_stream.statuses.filter(track = self._track)
             else:
                 i2 = None

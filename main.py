@@ -6,6 +6,7 @@ import json
 
 from configuration import Configuration
 import animator
+import animations
 
 import importlib
 
