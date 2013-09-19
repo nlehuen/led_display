@@ -18,10 +18,6 @@
                 "module": "animations.tweet",
                 "duration": 30.0,
                 "auth":{
-                    "basic":{
-                        "login":"XXXXXX",
-                        "password":"YYYYYY"
-                    },
                     "oauth":{
                         "consumer_key":"",
                         "consumer_secret":"",
